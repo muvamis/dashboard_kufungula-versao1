@@ -1,0 +1,8 @@
+tab_freq_ag_cabo_delgado <- cabo_delgado_data %>%
+  group_by(NUMERODASESSÃO, Comunidade, Sexo, presenca) %>%
+  summarise(n = n()) %>%
+  mutate(
+    freq = n / sum(n) * 100,
+    Percentagem = round(freq, digits = 0)
+  ) %>%
+  ungroup()
