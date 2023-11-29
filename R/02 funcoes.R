@@ -4,6 +4,7 @@ carregar_dados <- function(){
   # Nome dos ficheiros
   caracteristicas_Monapo <- paste(getwd(), "01 Raw/produtores/Monapo/Lista_caracteristicas_Monapo.xlsx", sep = "/")
   caracteristicas_Ribaue <- paste(getwd(), "01 Raw/produtores/Ribaue/Lista_caracteristicas_Ribaue.xlsx", sep = "/")
+ 
   
   # Base de dados de caracteristicas
   db_monapo <- read_excel(caracteristicas_Monapo, sheet = 1) %>% 
@@ -125,13 +126,13 @@ carregar_dados <- function(){
   # Atribuição dos ID's correctos nas listas de presenças
   db_presencas_ribaue <- merge(db_ribaue, db_presencas_ribaue, by = "NOME", all = TRUE) %>%
     mutate(ID_CERTO = ID.x) %>%
-    select(ID_CERTO, `Nome completo`, Sexo.x, Turma.x, `Presença (1- PRESENTE, 0 - AUSENTE, 2-DESISTENTE)`, `NUMERO DA SESSÃO`, Idade, Comunidade, Povoado) %>%
+    select(ID_CERTO, `Nome completo`, Sexo.x, Turma.x, `Presença (1- PRESENTE, 0 - AUSENTE, 2-DESISTENTE)`, `NUMERO DA SESSÃO`, Idade, NomeSessao, FormacaoPI, Comunidade, Povoado) %>%
     rename(ID = ID_CERTO, Sexo = Sexo.x, Turma = Turma.x, `Nome Completo` = `Nome completo`) %>%
     filter(!is.na(ID) & !is.na(`NUMERO DA SESSÃO`))
 
   db_presencas_monapo <- merge(db_monapo, db_presencas_monapo, by = "NOME", all = TRUE) %>%
     mutate(ID_CERTO = ID.x, Obs = NA) %>%
-    select(ID_CERTO, `Nome completo`, Sexo.x, Turma.x, `Presença (1- PRESENTE, 0 - AUSENTE, 2-DESISTENTE)`, `NUMERO DA SESSÃO`, Idade, Comunidade, Povoado) %>%
+    select(ID_CERTO, `Nome completo`, Sexo.x, Turma.x, `Presença (1- PRESENTE, 0 - AUSENTE, 2-DESISTENTE)`, `NUMERO DA SESSÃO`, Idade, NomeSessao, FormacaoPI, Comunidade, Povoado) %>%
     rename(ID = ID_CERTO, Sexo = Sexo.x, Turma = Turma.x, `Nome Completo` = `Nome completo`) %>%
     filter(!is.na(ID) & !is.na(`NUMERO DA SESSÃO`))
 
@@ -154,3 +155,9 @@ merge_worksheets <- function (file) {
   
   return(df)
 }
+
+
+
+
+
+

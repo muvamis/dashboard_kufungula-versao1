@@ -14,6 +14,8 @@ presenca_produtores <- presenca_produtores %>%
     presenca = `Presença (1- PRESENTE, 0 - AUSENTE, 2-DESISTENTE)`,
     NUMERODASESSÃO = `NUMERO DA SESSÃO`,
     Idade = Idade,
+    FormacaoPI = FormacaoPI,
+    NomeSessao = NomeSessao,
     Comunidade = Comunidade,
     Povoado = Povoado,
   ) %>%
@@ -33,7 +35,7 @@ presenca_produtores <- presenca_produtores %>%
 # FILTRO DOS PRESENTES NAS SESSOES
 tab_freq_ag <- presenca_produtores %>%
   filter(presenca %in% c("SIM","NAO"))  %>%
-  group_by(Comunidade,NUMERODASESSÃO,Sexo,presenca) %>%
+  group_by(Comunidade,NUMERODASESSÃO,FormacaoPI,NomeSessao,Sexo,presenca) %>%
   summarise(n = n()) %>%
   mutate(freq = n / sum(n) * 100, Percentagem = round(freq, digits = 0)) %>%
   ungroup()
@@ -45,7 +47,7 @@ tab_freq_ag <- tab_freq_ag %>% filter(presenca %in% "SIM")
 # DADOS Ribaue E Monapo
 dados_monapo <- presenca_produtores %>%
   filter(Comunidade == "Monapo") %>%
-  group_by(ID, Nome, Comunidade, NUMERODASESSÃO, Sexo, presenca) %>%
+  group_by(ID, Nome, Comunidade, NUMERODASESSÃO,FormacaoPI,NomeSessao,Sexo, presenca) %>%
   filter(presenca %in% c("SIM", "NAO")) %>%
   summarise(TotalPresentes = n())
 
@@ -55,17 +57,16 @@ dados_monapo <- subset(dados_monapo, select = -TotalPresentes)
 
 dados_ribaue <- presenca_produtores %>%
   filter(Comunidade == "Ribaue") %>%
-  group_by(ID, Nome, Comunidade, NUMERODASESSÃO, Sexo, presenca) %>%
+  group_by(ID, Nome, Comunidade, NUMERODASESSÃO,FormacaoPI,NomeSessao, Sexo, presenca) %>%
   filter(presenca %in% c("SIM", "NAO")) %>%
   summarise(TotalPresentes = n())
 
 # Remover a coluna2 do dataframe
 dados_ribaue <- subset(dados_ribaue, select = -TotalPresentes)
 
-comunidadelista <- read_excel(paste(getwd(), "dados/comunidadelista.xlsx", sep = "/"))
 #### tabela Nampula
 influentes <- read_excel("01 Raw/comunidade/Raw/Lista_influentes.xlsx")
-
+presenca_nampula <- rbind(dados_monapo,dados_ribaue)
 ###DADOS CABO DELGADO
 comunidade <- read_excel(paste(getwd(), "dados 01/presencas_tabela.xlsx", sep = "/"))
 presencas_tabela <- read_excel("dados 01/presencas_tabela.xlsx")
@@ -73,14 +74,11 @@ presencas_tabela <- read_excel("dados 01/presencas_tabela.xlsx")
 
 cabo_delgado_data <- read_excel("dados 01/produtores_delgado.xlsx")
 
-
-
-
 # ABA VISAO GERAL 
-produtores_Consider <- read_excel(paste(getwd(), "dados 01/produtores_Kufungula.xlsx", sep = "/"))
+produtores_Kufungula <- read_excel(paste(getwd(), "dados 01/produtores_Kufungula.xlsx", sep = "/"))
 
-dados = produtores_Consider %>% 
-  filter((produtores_Consider$presenca=="SIM" | produtores_Consider$presenca=="NAO")) 
+dados = produtores_Kufungula %>% 
+  filter((produtores_Kufungula$presenca=="SIM" | produtores_Kufungula$presenca=="NAO")) 
 
 inscritos_produtores <- dados %>%
   distinct(ID, Sexo, Turma, Regiao, Comunidade, .keep_all = TRUE) %>%
@@ -121,7 +119,6 @@ criarGraficoPresenca <- function(data, regiao) {
   # ...
   # Retorna o objeto do gráfico plotly
 }
-
 
 
 

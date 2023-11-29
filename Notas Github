@@ -1,0 +1,5 @@
+git add . -> para adicionar todos ficheiros modificados num unico sitio
+
+git commit -m "Texto que identifica as modificacoes feitas"
+
+git push origin main -> para enviar o codigo para o github

@@ -1,8 +1,9 @@
 # Check and install packages if needed
 packages <- c("readxl","RStata","reticulate", "shiny", "bslib", "ggthemes", "RColorBrewer", "sf", "shinythemes", "lubridate", "jsonlite",
               "stringr", "readr", "dplyr", "tidyverse", "shinyjs", "plotly", "ggplot2", "DT", "shinyWidgets",
-              "shinydashboard", "shinycssloaders", "ggmap", "ggspatial", "rmarkdown", "rgdal", "fontawesome", "haven", "readxl", "scales", "writexl", "openxlsx"
+              "shinydashboard", "shinycssloaders", "cowplot", "ggmap", "ggspatial", "rmarkdown", "rgdal", "fontawesome", "haven", "readxl", "gridExtra", "scales", "writexl", "openxlsx"
 )
+
 
 install_packages <- packages[!sapply(packages, requireNamespace, quietly = TRUE)]
 
@@ -42,4 +43,6 @@ library(readxl)
 library(scales)
 library(writexl)
 library(openxlsx)
+library(gridExtra)
+library(cowplot)
 
