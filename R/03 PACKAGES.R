@@ -1,14 +1,14 @@
 #####~
 #PACOTES ««« INSTALAR E CARREGAR 
-
+ 
 # Check and install packages if needed
 packages <- c("readxl","RStata","reticulate", "shiny", "bslib", "ggthemes", "RColorBrewer", "sf", "shinythemes", "lubridate", "jsonlite",
               "stringr", "readr", "dplyr", "tidyverse", "shinyjs", "plotly", "ggplot2", "DT", "shinyWidgets",
               "shinydashboard", "shinycssloaders", "cowplot", "ggmap", "ggspatial", "rmarkdown", "rgdal", "RStata",
-              "fontawesome", "haven", "readxl", "gridExtra", "scales", "writexl", "openxlsx", "kableExtra"
+              "fontawesome", "haven", "readxl", "gridExtra", "scales", "writexl", "openxlsx", "kableExtra", "rlang"
 )
 
-
+ 
 install_packages <- packages[!sapply(packages, requireNamespace, quietly = TRUE)]
 
 if (length(install_packages) > 0) {
@@ -18,6 +18,7 @@ if (length(install_packages) > 0) {
 # Load packages
 
 library(shiny)
+library(rlang)
 library(RStata)
 library(bslib)
 library(ggthemes)
@@ -52,4 +53,5 @@ library(gridExtra)
 library(cowplot)
 library(kableExtra)
  
+
 

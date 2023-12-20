@@ -1,26 +1,33 @@
  
  
-Kufungula <- read_excel("Data/Lista_Selecionados_Kufungula.xlsx")
+Kufungula <- read_excel("Data/Lista_Selecionados_Kufungula.xlsx") 
 
- 
+
+Presencas_clear <- read_dta("Data/Presencas_clear.dta")
+
+
+
 
 ###Limpeza
 
-# Carregar arquivo .dta
-Presencas_3 <- read_dta("Data/Raw/Versao 3/Presencas_clear.dta")
-Presencas_5 <- read_dta("Data/Raw/Versao 5/Presencas_clear.dta")
-
-##Unir as duas bases de dados 
-Presencas <- rbind(Presencas_3, Presencas_5) %>%
-  left_join(Presencas, Kufungula, by = "ID_Participante",all.x = TRUE) ## Merge com base geral 
+##Unir as duas bases de dados
+ 
+Presencas <- left_join(Presencas_clear, Kufungula, by = "ID_Participante") ## Merge com base geral 
 
 # Selecione apenas as colunas desejadas em Presencas_atualizado
+
+Presencas$Comunidade <- ifelse(is.na(Presencas$Comunidade.y), Presencas$Comunidade.x, Presencas$Comunidade.y)
+Presencas$Distrito <- ifelse(is.na(Presencas$Distrito), Presencas$Distrito, Presencas$Distrito)
+
 Presencas <- Presencas %>%
   select(
     Nome_Participante,
     Provincia,
-    Nome_District,
+    Idade,
+    Distrito,
+    Deslocado,
     Comunidade,
+    Sexo,
     Facilitator,
     Formation_PI,
     Session_PI,
@@ -31,7 +38,9 @@ Presencas <- Presencas %>%
     Reposicao_sessao
   )
 
-
+Presencas$Distrito <- sub("Ribaué", "Ribaue", Presencas$Distrito)
+ 
+ 
 ### Replace library(dplyr)
 
 # Suponha que df é seu dataframe e sessao_PI é a variável a ser modificada
@@ -48,10 +57,10 @@ Presencas <- Presencas %>%
     Session_PI == "Revisão" ~ "Sessao 9",
     TRUE ~ Session_PI # Mantém o valor original caso não corresponda a nenhum dos anteriores
   ))
-
+ 
 ############################################################################################
 Presencas <- Presencas %>%
-  mutate(sessao_AG = case_when(
+  mutate(Session = case_when(
     Session == "Abordagem sobre principios basicos de implementação de FFS" ~ "Sessao 1",
     Session == "Criterios de Identificação de areas para estabelecimento dos FFS (DRP)" ~ "Sessao 2",
     Session == "Demarcaçao de campos de(Parcelas para monocultura e culturas de consorciação)" ~ "Sessao 3",
@@ -64,94 +73,123 @@ Presencas <- Presencas %>%
   ))
 
 #######################################################################################################
-presencas_PI<-filter(Presencas, Presencas$Formation_PI=="Sim")
-presencas_AG<-filter(Presencas, Presencas$Formation_AG=="Sim")
 
-# presencas_AG$Província
-# presencas_AG$Distrito 
-# presencas_AG$Nome
+# Aplicar a função às colunas do DataFrame
+Presencas$Distrito <- remove_accents(Presencas$Distrito)
+Presencas$Presenca <- remove_accents(Presencas$Presenca)
+Presencas$Deslocado <- remove_accents(Presencas$Deslocado)
+Presencas$Facilitator <- remove_accents(Presencas$Facilitator)
+Presencas$Formation_AG <- remove_accents(Presencas$Formation_AG)
+Presencas$Formation_PI <- remove_accents(Presencas$Formation_PI)
+
+# Transformar as colunas em maiúsculas
+Presencas$Distrito <- toupper(Presencas$Distrito)
+Presencas$Presenca <- toupper(Presencas$Presenca)
+Presencas$Deslocado <- toupper(Presencas$Deslocado)
+Presencas$Facilitator <- toupper(Presencas$Facilitator)
+Presencas$Formation_AG <- toupper(Presencas$Formation_AG)
+Presencas$Formation_PI <- toupper(Presencas$Formation_PI)
  
-# Substituir "SIM" e "NÃO" por HTML para círculos coloridos
-# Usar a função reshape para transformar os dados
 
-# Exibir o resultado
-# Transformar os dados
-# presencas_AG$Sexo
-# presencas_AG$Idade
-# presencas_AG$
-  
-Data_presenca <-  Data_presenca %>%
+
+
+
+###############################################################################
+Data_presenca <-  Presencas %>%
   rename(presenca=Presenca,
          FormacaoPI=Session_PI,
          NomeSessao=Session)
- 
+
+
+presencas_PI<-filter(Data_presenca, Data_presenca$Formation_PI=="SIM")
+presencas_AG<-filter(Data_presenca, Data_presenca$Formation_AG=="SIM")
+
+
 
 ################  Tabela ##################################################
 
-# Seu código para criar tab_freq_PI
-tab_freq_PI <- Data_presenca %>%
-  filter(presenca == "Sim") %>%
-  group_by(Distrito, FormacaoPI, Sexo) %>%
-  summarise(n = n(), .groups = 'drop') %>%
+tab_freq_PI <- presencas_PI %>%
+  group_by(Distrito, FormacaoPI, Sexo,presenca) %>%
+  summarise(n = n()) %>%
   mutate(freq = n / sum(n) * 100, 
          Percentagem = round(freq, digits = 0)) %>%
-  ungroup()
+  ungroup() 
+
+##all
+tab_freq_PI_all <- presencas_PI %>%
+  group_by(FormacaoPI, Sexo,presenca) %>%
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n) * 100, 
+         Percentagem = round(freq, digits = 0)) %>%
+  ungroup() 
 
 # Seu código para criar tab_freq_AG
-tab_freq_AG<- Data_presenca %>%
-  filter(presenca == "Sim") %>%
-  group_by(Distrito, NomeSessao, Sexo) %>%
-  summarise(n = n(), .groups = 'drop') %>%
+
+tab_freq_AG <- presencas_AG %>%
+  group_by(Distrito, NomeSessao, Sexo,presenca) %>%
+  summarise(n = n()) %>%
   mutate(freq = n / sum(n) * 100, 
          Percentagem = round(freq, digits = 0)) %>%
-  ungroup()
+  ungroup() 
 
+###ALL
+tab_freq_AG_all <- presencas_AG %>%
+  group_by(NomeSessao,Sexo, presenca) %>%
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n) * 100, 
+         Percentagem = round(freq, digits = 0)) %>%
+  ungroup() 
+
+ 
+# library(esquisse)
+# esquisser(tab_freq_PI)
 
 ############################################################################
 
-# Crie intervalos de idade desejados
-intervalos_idade <- c(17, 24, 35)
+###########
+presencas_PI <- presencas_PI %>%
+  mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
+         `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
 
-# Use a função cut para criar fatores para intervalos de idade
-Data_presenca <- Data_presenca %>%
-  mutate(faixa_etaria = cut(Idade, breaks = intervalos_idade, labels = c("18-24", "25-35")))
+# Criação da tabela agregada
+Tabela_PI<- presencas_PI %>%
+  filter(presencas_PI$presenca == "SIM") %>%  # Filtrar apenas as presenças confirmadas
+  group_by(Distrito, Sexo, NomeSessao) %>%
+  summarise(
+    totais = n(),  # Contagem total por grupo
+    `Faixa Etária 18-24` = sum(`Faixa Etária 18-24`, na.rm = TRUE),
+    `Faixa Etária 25-35` = sum(`Faixa Etária 25-35`, na.rm = TRUE)
+  ) %>%
+  ungroup()
+############ 
 
+presencas_AG <- presencas_AG %>%
+  mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
+         `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
 
-resultado <- Data_presenca %>% filter(presenca=="Sim") %>%
-  group_by(Nome_District, Sexo, faixa_etaria) %>%
-  summarize(contagem = n()) %>%
-  ungroup() %>% 
-  group_by(Nome_District, Sexo) %>%
-  mutate(totais = sum(contagem)) %>%
-  spread(faixa_etaria, contagem) %>%
-  rename("Faixa Etária 18-24" = "18-24", "Faixa Etária 25-35" = "25-35") %>%
-  filter(!is.na(`Faixa Etária 18-24`) & !is.na(`Faixa Etária 25-35`))
-
-# Calculate cumulative totals by district
-resultado_totais <- resultado %>%
-  group_by(Nome_District) %>%
-  summarise(across(c(totais, `Faixa Etária 18-24`, `Faixa Etária 25-35`), sum)) %>%
-  mutate(Sexo = "Total Acumulados")
-
-# Combine resultado and resultado_totais
-resultado_final <- bind_rows(resultado, resultado_totais)
-
-# Create a separate row for cumulative totals
-total_row <- resultado_final %>%
-  group_by(Nome_District) %>%
-  summarise(across(c(totais, `Faixa Etária 18-24`, `Faixa Etária 25-35`), sum)) %>%
-  mutate(Sexo = "Total Acumulados")
-
-# Add the total_row to the table
-tabela_formatada <- resultado_final %>%
-  bind_rows(total_row)
-
-# Format the table using kable and kableExtra functions
-tabela_formatada <- tabela_formatada %>%
-  kable(format = "html", align = c("l", "l", "r", "r", "r"),
-        caption = "Contagem de Pessoas por Distrito, Sexo e Faixa Etária",
-        col.names = c("Distrito", "Sexo", "Totais", "Faixa Etária 18-24", "Faixa Etária 25-35")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"),
-                full_width = FALSE)
-
+# Criação da tabela agregada
+Tabela_AG <- presencas_AG %>%
+  filter(presencas_AG$presenca == "SIM") %>%  # Filtrar apenas as presenças confirmadas
+  group_by(Distrito, Sexo, NomeSessao) %>%
+  summarise(
+    totais = n(),  # Contagem total por grupo
+    `Faixa Etária 18-24` = sum(`Faixa Etária 18-24`, na.rm = TRUE),
+    `Faixa Etária 25-35` = sum(`Faixa Etária 25-35`, na.rm = TRUE)
+  ) %>%
+  ungroup()
  
+ #######################################
+
+ ##################Tabela para individual 
+
+Data_Individual_PI <- presencas_PI %>%
+  select(Nome_Participante, NomeSessao, presenca,Distrito, Comunidade) 
+
+Data_Individual_AG$cor <- ifelse(Data_Individual_AG$presenca == 'SIM', 'green', 'red')
+Data_Individual_AG <- presencas_AG %>%
+  select(Nome_Participante, NomeSessao, presenca,Distrito, Comunidade) 
+
+Data_Individual_AG$cor <- ifelse(Data_Individual_AG$presenca == 'SIM', 'green', 'red')
+
+# data_united <- Data_Individual_AG %>%
+# Gerar o gráfico de pontos

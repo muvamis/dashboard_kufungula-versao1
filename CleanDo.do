@@ -1,10 +1,10 @@
 clear all 
  
 tempfile geral
-
- use "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Linkadosssss 2023\PROJECTOS\SISTEMA DE MONITORIA\KunfugulaAPP\Data\Raw\Versao 3\Presencas.dta", clear 
  
- append using "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Linkadosssss 2023\PROJECTOS\SISTEMA DE MONITORIA\KunfugulaAPP\Data\Raw\Versao 5\Presencas.dta" 
+ use "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 3\Presencas.dta", clear 
+ 
+ append using "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 5\Presencas.dta" 
  
  foreach i in Nome_Participante Provincia Nome_District Comunidade Facilitator Formation_PI Session_PI Formation_AG Session ID_Participante Turma Presenca Reposicao_sessao {
    decode `i' , generate(`i'_1) 
@@ -41,9 +41,9 @@ save `geral', replace
 //// Imprimir tabela de duplicados
 keep if duplicados==1
 
+ 
 
-
-save "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Linkadosssss 2023\PROJECTOS\SISTEMA DE MONITORIA\KunfugulaAPP\Data\duplicados.dta" , replace 
+save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\duplicados.dta" , replace 
 
 
 
@@ -51,16 +51,18 @@ use `geral', clear
 ///Tabela de dados ausentes
 gen dado_ausente=0
 replace dado_ausente=1 if   Nome_Participante=="" | ID_Participante=="" | Session_PI=="" | Session=="" | Presenca=="" 
+save `geral', replace
+
 keep if dado_ausente==1
-save "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Linkadosssss 2023\PROJECTOS\SISTEMA DE MONITORIA\KunfugulaAPP\Data\ausente_data.dta" , replace 
+save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\ausente_data.dta" , replace 
 
 
 use `geral', clear
 
 drop if duplicados==1 
-
-
-save "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Linkadosssss 2023\PROJECTOS\SISTEMA DE MONITORIA\KunfugulaAPP\Data\Presencas_clear.dta" , replace 
+drop if dado_ausente==1
+drop duplicados dado_ausente
+save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Presencas_clear.dta" , replace 
 
 
 br
