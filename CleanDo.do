@@ -6,6 +6,8 @@ tempfile geral
  
  append using "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 5\Presencas.dta" 
  
+ 
+  
  foreach i in Nome_Participante Provincia Nome_District Comunidade Facilitator Formation_PI Session_PI Formation_AG Session ID_Participante Turma Presenca Reposicao_sessao {
    decode `i' , generate(`i'_1) 
    drop `i'
@@ -17,7 +19,6 @@ drop interview__key interview__id Imagem sssys_irnd has__errors interview__statu
 
 //drop if Nome_Participante=="" | Presenca==""
 
- 
 
 
 /// Tratar duplicados duplicados e apagar
@@ -47,7 +48,7 @@ save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\
 
 
 
-use `geral', clear
+use `geral', clear 
 ///Tabela de dados ausentes
 gen dado_ausente=0
 replace dado_ausente=1 if   Nome_Participante=="" | ID_Participante=="" | Session_PI=="" | Session=="" | Presenca=="" 
@@ -62,8 +63,20 @@ use `geral', clear
 drop if duplicados==1 
 drop if dado_ausente==1
 drop duplicados dado_ausente
+
+ 
+save `geral', replace 
+
+import excel "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Lista_Selecionados_Kufungula.xlsx", sheet("Sheet 1") firstrow clear
+merge m:m ID_Participante using  `geral'
+drop _merge
+
 save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Presencas_clear.dta" , replace 
 
+ 
+reshape wide presenca, i(ID_Participante) j(Session)
+ex
+   
 
 br
 

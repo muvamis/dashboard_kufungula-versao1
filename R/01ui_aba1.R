@@ -7,7 +7,7 @@ ui_aba1 <- fluidPage(
     tabPanel("Visão Geral",
              sidebarLayout(
                sidebarPanel(
-                 selectInput("distritoInput", "Escolha a Provincia:", choices = c("Todos",unique(Kufungula$Província)), selected = "Todos")),
+                 selectInput("ProvinciaInput", "Escolha a Provincia:", choices = c("Todos",unique(Kufungula$Provincia)), selected = "Todos")),
                mainPanel(
                  downloadButton("download_inscritos", "Baixar Inscritos", icon = icon("download")),
                  plotOutput("registradosPorProvincia"),

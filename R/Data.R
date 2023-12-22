@@ -3,28 +3,26 @@
 Kufungula <- read_excel("Data/Lista_Selecionados_Kufungula.xlsx") 
 
 
-Presencas_clear <- read_dta("Data/Presencas_clear.dta")
+Presencas <- read_dta("Data/Presencas_clear.dta")
 
 
+Nampula<- Kufungula %>% filter(Provincia=="Nampula") 
 
-
-###Limpeza
-
-##Unir as duas bases de dados
+Cabo_Delgado<- Kufungula %>% filter(Provincia=="Cabo Delgado") 
  
-Presencas <- left_join(Presencas_clear, Kufungula, by = "ID_Participante") ## Merge com base geral 
-
+  
 # Selecione apenas as colunas desejadas em Presencas_atualizado
 
-Presencas$Comunidade <- ifelse(is.na(Presencas$Comunidade.y), Presencas$Comunidade.x, Presencas$Comunidade.y)
-Presencas$Distrito <- ifelse(is.na(Presencas$Distrito), Presencas$Distrito, Presencas$Distrito)
-
+# Presencas$Comunidade <- ifelse(is.na(Presencas$Comunidade.y), Presencas$Comunidade.x, Presencas$Comunidade.y)
+# #Presencas$Distrito <- ifelse(is.na(Presencas$Distrito.y), Presencas$Distrito.x, Presencas$Distrito)
+# Presencas$Provincia <-  Presencas$Provincia.y 
+# Presencas$Facilitator <- ifelse(is.na(Presencas$Facilitator.y), Presencas$Facilitator.x, Presencas$Facilitator.y)
 Presencas <- Presencas %>%
   select(
     Nome_Participante,
     Provincia,
     Idade,
-    Distrito,
+    Nome_District,
     Deslocado,
     Comunidade,
     Sexo,
@@ -37,9 +35,9 @@ Presencas <- Presencas %>%
     Presenca,
     Reposicao_sessao
   )
-
-Presencas$Distrito <- sub("Ribaué", "Ribaue", Presencas$Distrito)
+ Presencas$Distrito <- Presencas$Nome_District
  
+Presencas$Distrito <- sub("Ribaué", "Ribaue", Presencas$Distrito)
  
 ### Replace library(dplyr)
 
@@ -48,7 +46,7 @@ Presencas <- Presencas %>%
   mutate(Session_PI = case_when(
     Session_PI == "Introdução: Pontos-Chave  (Proatividade e Reatividade, Pensar no futuro, Superar obstáculos, Explorar iniciativas pessoais))" ~ "Sessao 1",
     Session_PI == "O processo  empreendedor (Identificando oportunidades de negócio,  Tu e a IP,  Recursos)" ~ "Sessao 2",
-    Session_PI == "O Processo Empreendedor Identificando Oportunidades de  Negócio (Mercado,  Avaliação & Comentários)" ~ "Sessao 3",
+    Session_PI == "O Processo Empreendedor Identificando Oportunidades de  Negócio (Mercado,  Avaliação &amp; Comentários)" ~ "Sessao 3",
     Session_PI == "O Processo  Empreendedor Definição de Metas,  Planejamento" ~ "Sessao 4",
     Session_PI == "O Processo Empreendedor (Planejamento: Arranjar financiamento,  Estabelecer ligações,  Monitorar o progresso,  Contabilidade &  Poupança)" ~ "Sessao 5",
     Session_PI == "O Processo  Empreendedor (Comentários:  Experimentar, Erros)" ~ "Sessao 6",
@@ -57,7 +55,8 @@ Presencas <- Presencas %>%
     Session_PI == "Revisão" ~ "Sessao 9",
     TRUE ~ Session_PI # Mantém o valor original caso não corresponda a nenhum dos anteriores
   ))
- 
+
+
 ############################################################################################
 Presencas <- Presencas %>%
   mutate(Session = case_when(
@@ -95,59 +94,35 @@ Presencas$Formation_PI <- toupper(Presencas$Formation_PI)
 
 
 ###############################################################################
-Data_presenca <-  Presencas %>%
+Presencas <-  Presencas %>%
   rename(presenca=Presenca,
          FormacaoPI=Session_PI,
          NomeSessao=Session)
 
+Presencas<- Presencas  %>%
+  mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
+         `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
 
-presencas_PI<-filter(Data_presenca, Data_presenca$Formation_PI=="SIM")
-presencas_AG<-filter(Data_presenca, Data_presenca$Formation_AG=="SIM")
+presencas_PI<-filter(Presencas, Presencas$Formation_PI=="SIM")
+presencas_AG<-filter(Presencas, Presencas$Formation_AG=="SIM")
 
 
-
-################  Tabela ##################################################
-
-tab_freq_PI <- presencas_PI %>%
-  group_by(Distrito, FormacaoPI, Sexo,presenca) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100, 
-         Percentagem = round(freq, digits = 0)) %>%
-  ungroup() 
-
-##all
-tab_freq_PI_all <- presencas_PI %>%
-  group_by(FormacaoPI, Sexo,presenca) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100, 
-         Percentagem = round(freq, digits = 0)) %>%
-  ungroup() 
-
-# Seu código para criar tab_freq_AG
-
-tab_freq_AG <- presencas_AG %>%
-  group_by(Distrito, NomeSessao, Sexo,presenca) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100, 
-         Percentagem = round(freq, digits = 0)) %>%
-  ungroup() 
-
-###ALL
-tab_freq_AG_all <- presencas_AG %>%
-  group_by(NomeSessao,Sexo, presenca) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100, 
-         Percentagem = round(freq, digits = 0)) %>%
-  ungroup() 
-
+indiv_PI<- Presencas %>% pivot_wider(names_from =NomeSessao, values_from =presenca) 
+indiv_PI<- indiv_PI %>%
+  group_by(Nome_Participante, Distrito, Comunidade )  %>% summarize(
+    `Sessao 1`=max(`Sessao 1`, na.rm = T),
+    `Sessao 2`=max(`Sessao 2`, na.rm = T),
+    `Sessao 3`=max(`Sessao 3`, na.rm = T)
+  
+)
+  
  
-# library(esquisse)
-# esquisser(tab_freq_PI)
-
-############################################################################
-
 ###########
 presencas_PI <- presencas_PI %>%
+  mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
+         `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
+
+presencas_AG <- presencas_AG %>%
   mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
          `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
 
@@ -161,13 +136,13 @@ Tabela_PI<- presencas_PI %>%
     `Faixa Etária 25-35` = sum(`Faixa Etária 25-35`, na.rm = TRUE)
   ) %>%
   ungroup()
-############ 
+############
+#
+# presencas_AG <- presencas_AG %>%
+#   mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
+#          `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
 
-presencas_AG <- presencas_AG %>%
-  mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
-         `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
-
-# Criação da tabela agregada
+# # Criação da tabela agregada
 Tabela_AG <- presencas_AG %>%
   filter(presencas_AG$presenca == "SIM") %>%  # Filtrar apenas as presenças confirmadas
   group_by(Distrito, Sexo, NomeSessao) %>%
@@ -177,19 +152,7 @@ Tabela_AG <- presencas_AG %>%
     `Faixa Etária 25-35` = sum(`Faixa Etária 25-35`, na.rm = TRUE)
   ) %>%
   ungroup()
- 
+
  #######################################
 
- ##################Tabela para individual 
-
-Data_Individual_PI <- presencas_PI %>%
-  select(Nome_Participante, NomeSessao, presenca,Distrito, Comunidade) 
-
-Data_Individual_AG$cor <- ifelse(Data_Individual_AG$presenca == 'SIM', 'green', 'red')
-Data_Individual_AG <- presencas_AG %>%
-  select(Nome_Participante, NomeSessao, presenca,Distrito, Comunidade) 
-
-Data_Individual_AG$cor <- ifelse(Data_Individual_AG$presenca == 'SIM', 'green', 'red')
-
-# data_united <- Data_Individual_AG %>%
-# Gerar o gráfico de pontos
+ 

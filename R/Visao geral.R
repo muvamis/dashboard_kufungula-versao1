@@ -1,15 +1,15 @@
-# Filtrar dados baseado no distrito selecionado
-
-dadosFiltrados<- function() {
-  
-  
-  
-}
-
-#input$distritoInput
-
+# # Filtrar dados baseado no distrito selecionado
 # 
+# dadosFiltrados<- function() {
+#   
+#   
+#   
+# }
 # 
+# #input$distritoInput
+# 
+# # 
+# # 
 
 # 
 # # Gráfico de Deslocados por Província

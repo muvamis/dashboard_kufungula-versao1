@@ -4,34 +4,39 @@ ui_aba2 <- fluidPage(
          tabsetPanel(
            tabPanel("Sessões de PI",
                     sidebarLayout(
-                      sidebarPanel(
+                      sidebarPanel( 
                         radioButtons("distritoInput_namp_pi", "Escolha o Distrito:",
-                                     choices = c("Todos", unique(Presencas$Distrito)),
-                                     selected = "MONAPO")
+                                     choices = c("TODOS", unique(Presencas$Distrito)),
+                                     selected = "TODOS")
                         # ... outros elementos UI para Sessões de PI
                       ),
                       mainPanel(
-                        # ... conteúdo do painel principal para Sessões de PI
+                        plotOutput("graficoParticipacaoGlobal")
                       )
                     )
            ),
            tabPanel("Sessões de AG",
                     sidebarLayout(
                       sidebarPanel(
-                        # ... elementos UI para Sessões de AG
+                        radioButtons("distritoInput_namp_AG", "Escolha o Distrito:",
+                                     choices = c("TODOS", unique(Presencas$Distrito)),
+                                     selected = "TODOS")
+                        
                       ),
                       mainPanel(
-                        # ... conteúdo do painel principal para Sessões de AG
+                        plotOutput("graficoParticipacaoGlobal_AG") 
                       )
                     )
            ),
            tabPanel("Tabela",
                     sidebarLayout(
                       sidebarPanel(
-                        # ... elementos UI para Tabela
+                        radioButtons("tabela_sessao", "Escolha o tipo de formacao:",
+                                     choices = c("PI", "AG"),
+                                     selected = "PI")
                       ),
                       mainPanel(
-                        # ... conteúdo do painel principal para Tabela
+                        dataTableOutput("Tabelasessao")
                       )
                     )
            )
