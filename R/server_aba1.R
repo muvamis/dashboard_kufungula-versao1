@@ -1,7 +1,7 @@
 # server_aba1 <- function(input, output, session) {
 #   #######################APA GERAL ##########################################  
 #   ###GERAL
-#   
+#    
 #   # Filtrar dados baseado no distrito selecionado
 #   dadosFiltrados <- reactive({
 #     if (input$distritoInput == "Todos") {

@@ -2,7 +2,7 @@
  
 Kufungula <- read_excel("Data/Lista_Selecionados_Kufungula.xlsx") 
 
-
+ 
 Presencas <- read_dta("Data/Presencas_clear.dta")
 
 

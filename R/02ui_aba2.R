@@ -1,5 +1,5 @@
 ui_aba2 <- fluidPage(
-  
+   
   tabPanel("Participação Global",
          tabsetPanel(
            tabPanel("Sessões de PI",

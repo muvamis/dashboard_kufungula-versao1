@@ -4,7 +4,7 @@ library(shinythemes)
 # Carregar UIs e Servers de abas individuais
 source("R/01ui_aba1.R")
 # source("R/server_aba1.R") 
-source("R/02ui_aba2.R")
+source("R/02ui_aba2.R") 
 # source("R/server_aba2.R") 
 # ... (outros sources conforme necessário)
 
@@ -36,17 +36,17 @@ server <- function(input, output, session) {
   
   
     #######################APA GERAL ##########################################  
-#   dadosFiltrados_PI <- reactive ({
-#     if (input$ProvinciaInput== "Todos") {
-#       Inscritos<- calcular_frequencias(Kufungula, Distrito, Sexo)
-#     } else if (input$ProvinciaInput== "Nampula"){
-#       Inscritos<- calcular_frequencias(Nampula, Distrito, Sexo)
-#     } else if (input$ProvinciaInput== "Cabo Delgado"){ 
-#       Inscritos <- calcular_frequencias(Cabo_Delgado, Distrito, Sexo)
-#   }
-#     return(Inscritos)
-# })
-  ##################################################
+  #baixar dados 
+ # https://dashboard.muvamoz.org/dashboard/2023/dashboard_kufungula-versao1
+   
+  output$download_inscritos <- downloadHandler(
+    filename = function() {
+      "Kufungula.xlsx"
+    },
+    content = function(file) {
+      write_xlsx(Kufungula, path = file) 
+    }
+  )
     dadosFiltrados <- reactive({
       if (input$ProvinciaInput == "Todos") {
         return(Kufungula)
@@ -55,7 +55,7 @@ server <- function(input, output, session) {
       } 
     })
   
- ## RenderPlot para o gráfico ###formacao PI
+ 
   output$registradosPorProvincia <- renderPlot({
     ggplot(dadosFiltrados(), aes(x = Distrito, fill = Sexo)) +
       geom_bar(position = "dodge") +
@@ -119,7 +119,8 @@ server <- function(input, output, session) {
 
   })
   
-  ######################## input filtro#################################
+
+######################## input filtro#################################
   dadosFiltrados_AG <- reactive({
     if (input$distritoInput_namp_AG== "TODOS") {
       
@@ -157,10 +158,8 @@ server <- function(input, output, session) {
     
   }) 
   
-  #########tabela individual ################################ 
 
-  
-  # Atualizar a seleção de comunidades baseada na escolha do distrito
+#########tabela individual ################################ 
   output$com_select_ui <- renderUI({
     distrito_escolhido <- input$ind_input_dist
     comunidades <- unique(Presencas[Presencas$Distrito == distrito_escolhido, "Comunidade"])

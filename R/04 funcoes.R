@@ -1,5 +1,5 @@
 ####Funcoes 
- 
+  
 # Função para remover acentuação
 remove_accents <- function(text) {
   text <- tolower(text)
