@@ -125,11 +125,11 @@ presencas_PI <- presencas_PI %>%
 presencas_AG <- presencas_AG %>%
   mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
          `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
-
+ 
 # Criação da tabela agregada
 Tabela_PI<- presencas_PI %>%
   filter(presencas_PI$presenca == "SIM") %>%  # Filtrar apenas as presenças confirmadas
-  group_by(Distrito, Sexo, NomeSessao) %>%
+  group_by(Distrito,Comunidade, Sexo, NomeSessao) %>%
   summarise(
     totais = n(),  # Contagem total por grupo
     `Faixa Etária 18-24` = sum(`Faixa Etária 18-24`, na.rm = TRUE),
@@ -145,7 +145,7 @@ Tabela_PI<- presencas_PI %>%
 # # Criação da tabela agregada
 Tabela_AG <- presencas_AG %>%
   filter(presencas_AG$presenca == "SIM") %>%  # Filtrar apenas as presenças confirmadas
-  group_by(Distrito, Sexo, NomeSessao) %>%
+  group_by(Distrito,Comunidade, Sexo, NomeSessao) %>%
   summarise(
     totais = n(),  # Contagem total por grupo
     `Faixa Etária 18-24` = sum(`Faixa Etária 18-24`, na.rm = TRUE),
