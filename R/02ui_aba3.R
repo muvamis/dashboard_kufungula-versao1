@@ -9,12 +9,13 @@ ui_aba3 <- fluidPage(
            sidebarLayout(
              sidebarPanel( 
                selectInput("ind_input_dist", "Escolha o Distrito:",
-                            choices = c(unique(Presencas$Distrito)),
-                            selected = "MONAPO"),
+                            choices = c("TODOS",unique(Presencas$Distrito)),
+                            selected = "TODOS"),
                # selectInput("ind_input_com", "Escolha o Distrito:",
                #              choices = c("TODOS", unique(Presencas$Comunidade)),
                #              selected = "TODOS")
-               uiOutput("com_select_ui")
+               uiOutput("com_select_ui"),
+               downloadButton("downloadDataINDIVIDUL", "Baixar Tabela")
                  # ... outros elementos UI para Sessões de PI
                ),
                mainPanel(

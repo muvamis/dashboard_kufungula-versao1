@@ -39,6 +39,7 @@ server <- function(input, output, session) {
   #baixar dados 
  # https://dashboard.muvamoz.org/dashboard/2023/dashboard_kufungula-versao1
    
+  ###########################baixar dados de inscritos####################################
   output$download_inscritos <- downloadHandler(
     filename = function() {
       "Kufungula.xlsx"
@@ -47,50 +48,113 @@ server <- function(input, output, session) {
       write_xlsx(Kufungula, path = file) 
     }
   )
-    dadosFiltrados <- reactive({
-      if (input$ProvinciaInput == "Todos") {
-        return(Kufungula)
-      } else {
-        return(subset(Kufungula, Provincia == input$ProvinciaInput))
-      } 
-    })
-  
- 
-  output$registradosPorProvincia <- renderPlot({
-    ggplot(dadosFiltrados(), aes(x = Distrito, fill = Sexo)) +
-      geom_bar(position = "dodge") +
-      scale_fill_manual(values = c(Feminino = "#9942D4", Masculino = "#F77333")) +
-      labs(title = "Total de Registrados por Distrito e Sexo",
-           x = "Distrito",
-           y = "Total de Registrados") +
-      theme_stata() +
-      geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
+  # Atualizando 'distritoInputGeral' com base na província selecionada
+  observeEvent(input$ProvinciaInput, {
+    distritos <- if (input$ProvinciaInput == "Todos") {
+      unique(Kufungula$Distrito)
+    } else {
+      unique(Kufungula$Distrito[Kufungula$Provincia == input$ProvinciaInput])
+    }
+    updateSelectInput(session, "distritoInputGeral", choices = c("Todos", distritos))
   })
+
+  #################################
+######################### Atualizando 'comunidadeInputGeral' com base no distrito selecionado
   
-  output$deslocadosPorProvincia <- renderPlot({
-        ggplot(subset(dadosFiltrados(), Deslocado == "Sim"), aes(x = Distrito, fill = Sexo)) +
-          geom_bar(position = "dodge") +
-          scale_fill_manual(values = c(Feminino = "#9942D4", Masculino = "#F77333")) +
-          labs(title = "Número de Deslocados por Província e Sexo",
-               x = "Província",
-               y = "Número de Deslocados") +
-          theme_stata() +
-          geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
-      })
+  observeEvent(input$distritoInputGeral, {
+    comunidades <- if (input$distritoInputGeral == "Todos") {
+      unique(Kufungula$Comunidade)
+    } else {
+      unique(Kufungula$Comunidade[Kufungula$Distrito == input$distritoInputGeral])
+    }
+    updateSelectInput(session, "comunidadeInputGeral", choices = c("Todos", comunidades))
+  })
 
-
-
+    # Função reativa para filtrar dados
+    dadosFiltrados <- reactive({
+      dados <- Kufungula
+      if (input$ProvinciaInput != "Todos") {
+        dados <- dados[dados$Provincia == input$ProvinciaInput,]
+      }
+      if (input$distritoInputGeral != "Todos") {
+        dados <- dados[dados$Distrito == input$distritoInputGeral,]
+      }
+      if (input$comunidadeInputGeral != "Todos") {
+        dados <- dados[dados$Comunidade == input$comunidadeInputGeral,]
+      }
+      dados
+    })
+    
+ 
+    # Gráfico de barras para 'registradosPorProvincia'
+    output$registradosPorProvincia <- renderPlot({
+      dados <- dadosFiltrados()
+      eixo_x <- if (input$comunidadeInputGeral != "Todos") {
+        aes(x = Comunidade, fill = Sexo)
+      } else {
+        aes(x = Distrito, fill = Sexo)
+      }
+      ggplot(dados, eixo_x) +
+        geom_bar(position = "dodge") +
+        scale_fill_manual(values = c(Feminino = "#9942D4", Masculino = "#F77333")) +
+        labs(title = "Total de Registrados por Distrito/Comunidade e Sexo",
+             x = ifelse(input$comunidadeInputGeral != "Todos", "Comunidade", "Distrito"),
+             y = "Total de Registrados") +
+        theme_stata() +
+        geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
+    }) 
+    
+    # Gráfico de barras para 'deslocadosPorProvincia'
+    output$deslocadosPorProvincia <- renderPlot({
+      dados <- subset(dadosFiltrados(), Deslocado == "Sim")
+      eixo_x <- if (input$comunidadeInputGeral != "Todos") {
+        aes(x = Comunidade, fill = Sexo)
+      } else {
+        aes(x = Distrito, fill = Sexo)
+      }
+      ggplot(dados, eixo_x) +
+        geom_bar(position = "dodge") +
+        scale_fill_manual(values = c(Feminino = "#9942D4", Masculino = "#F77333")) +
+        labs(title = "Número de Deslocados por Distrito/Comunidade e Sexo",
+             x = ifelse(input$comunidadeInputGeral != "Todos", "Comunidade", "Distrito"),
+             y = "Número de Deslocados") +
+        theme_stata() +
+        geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
+    })
+####################FIM DE GERAL ##########################################################
+    
 ############## Nampula ########
 ###########   PI  ################
-  dadosFiltrados_PI <- reactive({
-    if (input$distritoInput_namp_pi== "TODOS") {
+
+    observeEvent(input$distritoInput_namp_pi, {
+      # Filtrar as comunidades com base no distrito selecionado
+      comunidades_filtradas <- if (input$distritoInput_namp_pi == "TODOS") {
+        unique(Presencas$Comunidade)
+      } else {
+        unique(Presencas$Comunidade[Presencas$Distrito == input$distritoInput_namp_pi])
+      }
       
-      return(calcular_frequencias(presencas_PI, FormacaoPI, Sexo,presenca))
-    } else {
-      return(calcular_frequencias(filter(presencas_PI, Distrito == input$distritoInput_namp_pi),Distrito, FormacaoPI, Sexo,presenca)
-        )
-    }
-  })
+      # Atualizar as opções de comunidade
+      updateSelectInput(session, "comunidadeInput_namp_pi",
+                        choices = c("TODAS", comunidades_filtradas))
+    })
+    dadosFiltrados_PI <- reactive({
+  # Filtrar com base na seleção de distrito
+  dados_filtrados <- if (input$distritoInput_namp_pi == "TODOS") {
+    presencas_PI
+  } else {
+    filter(presencas_PI, Distrito == input$distritoInput_namp_pi)
+  }
+
+  # Filtrar com base na seleção de comunidade
+  if (input$comunidadeInput_namp_pi != "TODAS") {
+    dados_filtrados <- filter(dados_filtrados, Comunidade == input$comunidadeInput_namp_pi)
+  }
+
+  # Chamar a função calcular_frequencias com os dados filtrados
+  calcular_frequencias(dados_filtrados, FormacaoPI, Sexo, presenca)
+})
+
   # RenderPlot para o gráfico ###formacao PI
   output$graficoParticipacaoGlobal <- renderPlot({
     # Seu código para criar tab_freq_PI
@@ -121,14 +185,33 @@ server <- function(input, output, session) {
   
 
 ######################## input filtro#################################
-  dadosFiltrados_AG <- reactive({
-    if (input$distritoInput_namp_AG== "TODOS") {
-      
-      return(calcular_frequencias(presencas_AG, NomeSessao, Sexo,presenca))
+  observeEvent(input$distritoInput_namp_AG, {
+    # Filtrar as comunidades com base no distrito selecionado
+    comunidades_filtradas <- if (input$distritoInput_namp_AG == "TODOS") {
+      unique(Presencas$Comunidade)
     } else {
-      return(calcular_frequencias(filter(presencas_AG, Distrito == input$distritoInput_namp_AG),Distrito, NomeSessao, Sexo,presenca)
-      )
+      unique(Presencas$Comunidade[Presencas$Distrito == input$distritoInput_namp_AG])
     }
+    
+    # Atualizar as opções de comunidade
+    updateSelectInput(session, "comunidadeInput_namp_AG",
+                      choices = c("TODAS", comunidades_filtradas))
+  })
+  dadosFiltrados_AG <- reactive({
+    # Filtrar com base na seleção de distrito
+    dados_filtrados <- if (input$distritoInput_namp_AG == "TODOS") {
+      presencas_AG
+    } else {
+      filter(presencas_AG, Distrito == input$distritoInput_namp_AG)
+    }
+    
+    # Filtrar com base na seleção de comunidade
+    if (input$comunidadeInput_namp_AG != "TODAS") {
+      dados_filtrados <- filter(dados_filtrados, Comunidade == input$comunidadeInput_namp_AG)
+    }
+    
+    # Chamar a função calcular_frequencias com os dados filtrados
+    calcular_frequencias(dados_filtrados, NomeSessao, Sexo, presenca)
   })
   # RenderPlot para o gráfico ###formacao PI
   output$graficoParticipacaoGlobal_AG <- renderPlot({
@@ -163,36 +246,78 @@ server <- function(input, output, session) {
   output$com_select_ui <- renderUI({
     distrito_escolhido <- input$ind_input_dist
     comunidades <- unique(Presencas[Presencas$Distrito == distrito_escolhido, "Comunidade"])
-    selectInput("ind_input_com", "Escolha a Comunidade:", choices = comunidades)
+    selectInput("ind_input_com", "Escolha a Comunidade:", choices = c("TODOS",comunidades))
   })
   
   # Renderizar a DataTable baseada na seleção do usuário
-  output$Tabelaindividual <- renderDataTable({
+  dados_filtrados_INDIV <- reactive({
     distrito_escolhido <- input$ind_input_dist
     comunidade_escolhida <- input$ind_input_com
     
-    # Filtrar o DataFrame com base no distrito e na comunidade
-    dados_filtrados <- indiv_PI[indiv_PI$Distrito == distrito_escolhido & indiv_PI$Comunidade == comunidade_escolhida, ]
+    # Se 'TODOS' for selecionado no distrito, ignorar a filtragem por distrito
+    if (distrito_escolhido == "TODOS") {
+      dados <- indiv_PI
+    } else {
+      dados <- indiv_PI[indiv_PI$Distrito == distrito_escolhido, ]
+    }
     
-    # Se não houver escolha de comunidade ou se a comunidade for "TODOS", mostrar todos os dados do distrito
-    if(is.null(comunidade_escolhida) || comunidade_escolhida == "TODOS") {
-      dados_filtrados <- indiv_PI[indiv_PI$Distrito == distrito_escolhido, ]
-    } 
-       
-    # Renderizar a tabela
-    datatable(dados_filtrados)
+    # Aplicar filtragem adicional para a comunidade, se necessário
+    if (!is.null(comunidade_escolhida) && comunidade_escolhida != "TODOS") {
+      dados <- dados[dados$Comunidade == comunidade_escolhida, ]
+    }
+    
+    dados
   })
   
-########################### TABELA PI ##########################################
+  # Usar dados_filtrados_INDIV no renderDataTable
+  output$Tabelaindividual <- renderDataTable({
+    datatable(dados_filtrados_INDIV())
+  })
   
-  output$Tabelasessao <- renderDataTable({
-   if (input$tabela_sessao=="AG") {
-     datatable(Tabela_AG)
-   } else  {
-     datatable(Tabela_PI) 
-       }
+  # Usar dados_filtrados_INDIV no downloadHandler
+  output$downloadDataINDIVIDUL <- downloadHandler(
+    filename = function() {
+      paste("Presencas_", input$ind_input_dist, "_", input$ind_input_com,"_",Sys.Date(), ".xlsx", sep = "")
+    },
+    content = function(file) {
+      require(openxlsx)
+      write.xlsx(dados_filtrados_INDIV(), file)
+    }
+  )
+  # output$Tabelasessao <- renderDataTable({
+  #   datatable(dadosFiltrados_TABELA())
+  # })
+########################### TABELA PI ##########################################
+  dadosFiltrados_TABELA <- reactive({
+    # Escolher o dataframe com base na seleção do tipo de formação
+    dados_selecionados <- if (input$tabela_sessao == "AG") {
+      Tabela_AG
+    } else {
+      Tabela_PI
+    }
     
-  })   
+    # Aplicar filtro adicional com base na seleção da comunidade
+    if (input$comunidadeInput_tabela != "TODAS") {
+      dados_selecionados <- filter(dados_selecionados, Comunidade == input$comunidadeInput_tabela)
+    }
+    
+    dados_selecionados
+  })
+  
+  # Renderizar a DataTable baseada na seleção do usuário e filtragem
+  output$downloadDatatABELA <- downloadHandler(
+    filename = function() {
+      paste("tabela_", input$tabela_sessao, "_", Sys.Date(), ".xlsx", sep = "")
+    },
+    content = function(file) {
+      require(openxlsx)
+      write.xlsx(dadosFiltrados_TABELA(), file)
+    }
+  )
+  output$Tabelasessao <- renderDataTable({
+    datatable(dadosFiltrados_TABELA())
+  })
+   
 }
 # Executar o aplicativo
 shinyApp(ui, server)
