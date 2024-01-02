@@ -18,20 +18,20 @@ tempfile geral
 drop interview__key interview__id Imagem sssys_irnd has__errors interview__status assignment__id
 
 //drop if Nome_Participante=="" | Presenca==""
-
-
+sort  Nome_Participante
 
 /// Tratar duplicados duplicados e apagar
 replace Facilitator="Marlene João Alfredo" if Nome_Participante=="Agira P. Pastola"
  
-
 ////
-bysort Nome_Participante ID_Participante Session_PI Session Presenca : gen duplicados_delete= cond(_n > 1, 1, 0)
-drop if duplicados_delete>0
-//drop duplicados_delete
+//bysort Nome_Participante ID_Participante Session_PI Session Presenca : gen duplicados_delete= cond(_n > 1, 1, 0)
 
-tab duplicados_delete
-drop duplicados_delete
+  
+//drop if duplicados_delete>0
+//drop duplicados_delete
+ 
+//tab duplicados_delete
+//drop duplicados_delete
 
 
 bysort Nome_Participante ID_Participante Session_PI Session: gen duplicados = cond(_N> 1, 1, 0)
@@ -60,20 +60,25 @@ save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\
 
 use `geral', clear
 
-drop if duplicados==1 
+//drop if duplicados==1 
 drop if dado_ausente==1
 drop duplicados dado_ausente
-
+bysort Nome_Participante ID_Participante Session_PI Session: gen duplicados = _n
+tab duplicados
+ 
+ 
+ bysort Nome_Participante: gen duplicados_name= _n
+ tab duplicados_name
  
 save `geral', replace 
-
+ 
 import excel "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Lista_Selecionados_Kufungula.xlsx", sheet("Sheet 1") firstrow clear
 merge m:m ID_Participante using  `geral'
 drop _merge
 
 save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Presencas_clear.dta" , replace 
 
- 
+ ex
 reshape wide presenca, i(ID_Participante) j(Session)
 ex
    
