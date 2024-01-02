@@ -1,7 +1,7 @@
 library(shiny)
-library(shinythemes)  
+library(shinythemes)   
 
-# Carregar UIs e Servers de abas individuais
+# Carregar UIs e Servers de abas individuais 
 source("R/01ui_aba1.R")
 # source("R/server_aba1.R") 
 source("R/02ui_aba2.R") 
@@ -300,7 +300,7 @@ server <- function(input, output, session) {
     if (input$comunidadeInput_tabela != "TODAS") {
       dados_selecionados <- filter(dados_selecionados, Comunidade == input$comunidadeInput_tabela)
     }
-    
+     
     dados_selecionados
   })
   
@@ -315,7 +315,7 @@ server <- function(input, output, session) {
     }
   )
   output$Tabelasessao <- renderDataTable({
-    datatable(dadosFiltrados_TABELA())
+    (datatable(dadosFiltrados_TABELA()))
   })
    
 }

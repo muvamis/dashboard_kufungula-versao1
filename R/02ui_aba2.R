@@ -1,12 +1,8 @@
 ui_aba2 <- fluidPage(
   tabPanel("Participação Global",
-           tabsetPanel(
+           tabsetPanel( 
              tabPanel("Sessões de PI",
-<<<<<<< HEAD
                       sidebarLayout(
-=======
-                      sidebarLayout( 
->>>>>>> 35ff5d7e74b2c1f114918508b51d2b6738a3e7e5
                         sidebarPanel(
                           radioButtons("distritoInput_namp_pi", "Escolha o Distrito:",
                                        choices = c("TODOS", unique(Presencas$Distrito)),
@@ -17,7 +13,7 @@ ui_aba2 <- fluidPage(
                           # ... outros elementos UI para Sessões de PI
                         ),
                         mainPanel(
-                          plotOutput("graficoParticipacaoGlobal")
+                          withSpinner(plotOutput("graficoParticipacaoGlobal"))
                         )
                       )
              ),
@@ -33,7 +29,7 @@ ui_aba2 <- fluidPage(
                           # ... outros elementos UI para Sessões de AG
                         ),
                         mainPanel(
-                          plotOutput("graficoParticipacaoGlobal_AG")
+                          withSpinner(plotOutput("graficoParticipacaoGlobal_AG"))
                         )
                       )
              ),
@@ -49,7 +45,7 @@ ui_aba2 <- fluidPage(
                           downloadButton("downloadDatatABELA", "Baixar Tabela")
                         ),
                         mainPanel(
-                          dataTableOutput("Tabelasessao")
+                          withSpinner(dataTableOutput("Tabelasessao"))
                         )
                       )
              )

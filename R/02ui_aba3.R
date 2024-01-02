@@ -19,7 +19,7 @@ ui_aba3 <- fluidPage(
                  # ... outros elementos UI para Sessões de PI
                ),
                mainPanel(
-               dataTableOutput("Tabelaindividual")
+                 withSpinner(dataTableOutput("Tabelaindividual"))
                #plotOutput("Tabelaindividual")
                
               )
