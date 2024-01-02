@@ -4,7 +4,7 @@ ui_aba3 <- fluidPage(
   #navbarPage(
   title = "Navegação", 
   id = "main_tabs",   
-  tabPanel("Visão Geral",
+  tabPanel("Visão Geral", 
            
            sidebarLayout(
              sidebarPanel( 

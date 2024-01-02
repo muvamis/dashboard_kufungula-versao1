@@ -30,7 +30,7 @@ library(DT)
 renderizar_tabela_interativa <- function(dataframe, ...) {
   tabela_frequencias <- calcular_frequencias(dataframe, ...)
   datatable(tabela_frequencias, options = list(pageLength = 5, autoWidth = TRUE))
-}
+} 
 
 
 ###########

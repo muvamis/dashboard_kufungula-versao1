@@ -5,13 +5,13 @@ tempfile geral
  use "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 3\Presencas.dta", clear 
  
  append using "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 5\Presencas.dta" 
- 
+  append using "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 6\Presencas.dta" 
  
   
  foreach i in Nome_Participante Provincia Nome_District Comunidade Facilitator Formation_PI Session_PI Formation_AG Session ID_Participante Turma Presenca Reposicao_sessao {
    decode `i' , generate(`i'_1) 
    drop `i'
-   ren `i'_1 `i'
+   ren `i'_1 `i' 
 
 }
 
