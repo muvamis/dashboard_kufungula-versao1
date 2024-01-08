@@ -318,6 +318,6 @@ server <- function(input, output, session) {
     (datatable(dadosFiltrados_TABELA()))
   })
    
-}
+} 
 # Executar o aplicativo
 shinyApp(ui, server)

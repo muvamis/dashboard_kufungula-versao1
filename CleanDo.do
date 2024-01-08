@@ -1,50 +1,48 @@
 clear all 
  
+ 
+ global caminho  "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\DEPARTAMENTO MIS\DEPARTAMENTO MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data"
 tempfile geral
  
- use "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 3\Presencas.dta", clear 
+ use "$caminho\Raw\Versao 3\Presencas.dta", clear 
  
- append using "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 5\Presencas.dta" 
-  append using "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Raw\Versao 6\Presencas.dta" 
- 
+ append using "$caminho\Raw\Versao 5\Presencas.dta" 
+  append using "$caminho\Raw\Versao 6\Presencas.dta" 
+
   
  foreach i in Nome_Participante Provincia Nome_District Comunidade Facilitator Formation_PI Session_PI Formation_AG Session ID_Participante Turma Presenca Reposicao_sessao {
    decode `i' , generate(`i'_1) 
    drop `i'
    ren `i'_1 `i' 
 
-}
-
-drop interview__key interview__id Imagem sssys_irnd has__errors interview__status assignment__id
-
-//drop if Nome_Participante=="" | Presenca==""
+} 
+ 
+drop Nome_District	Comunidade	Facilitator interview__key interview__id Imagem sssys_irnd has__errors interview__status assignment__id
 sort  Nome_Participante
-
-/// Tratar duplicados duplicados e apagar
-replace Facilitator="Marlene João Alfredo" if Nome_Participante=="Agira P. Pastola"
+ ren Nome_Participante Nome_participante
+ replace Nome_participante=upper(Nome_participante)
  
-////
-//bysort Nome_Participante ID_Participante Session_PI Session Presenca : gen duplicados_delete= cond(_n > 1, 1, 0)
-
+ merge m:m ID_Participante using "$caminho\Lista_Nampula_Kufugula.dta"
+ drop if _merge==1
+ replace Presenca="Nao" if _merge==2
   
-//drop if duplicados_delete>0
-//drop duplicados_delete
- 
-//tab duplicados_delete
-//drop duplicados_delete
-
-
-bysort Nome_Participante ID_Participante Session_PI Session: gen duplicados = cond(_N> 1, 1, 0)
-tab duplicados
-
+//export excel using "$caminho\Desistentes.xls" if _merge==1, firstrow(variables) replace
 save `geral', replace
-
+ sort ID_Participante
+br 
+ex
+ 
+bysort Nome_Participante ID_Participante Session_PI Session: gen duplicados = cond(_N> 1, 1, 0)
+duplicates tag duplicados Nome_Participante ID_Participante Session_PI Session, gen(dup)
+br if dup>0
+save `geral', replace
+ex
 //// Imprimir tabela de duplicados
 keep if duplicados==1
 
  
 
-save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\duplicados.dta" , replace 
+save "$caminho\duplicados.dta" , replace 
 
 
 
@@ -55,7 +53,7 @@ replace dado_ausente=1 if   Nome_Participante=="" | ID_Participante=="" | Sessio
 save `geral', replace
 
 keep if dado_ausente==1
-save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\ausente_data.dta" , replace 
+save "$caminho\ausente_data.dta" , replace 
 
 
 use `geral', clear
@@ -67,8 +65,12 @@ bysort Nome_Participante ID_Participante Session_PI Session: gen duplicados = _n
 tab duplicados
  
  
- bysort Nome_Participante: gen duplicados_name= _n
- tab duplicados_name
+ bysort ID_Participante  : gen duplicados_id = _n
+ 
+keep if duplicados_id==1
+ren ID_Participante ID
+merge m:m ID using "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Desktop\ID.dta"
+ex
  
 save `geral', replace 
  
@@ -79,11 +81,9 @@ drop _merge
 save "C:\Users\MUVA\OneDrive\Projectos Rstudio\2023\dashboard_kufungula-versao1\Data\Presencas_clear.dta" , replace 
 
  ex
-reshape wide presenca, i(ID_Participante) j(Session)
-ex
-   
-
-br
+ reshape wide presenca, i(ID_Participante) j(Session)
+ ex
+ br
 
  
 
