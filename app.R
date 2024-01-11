@@ -96,7 +96,7 @@ server <- function(input, output, session) {
       }
       ggplot(dados, eixo_x) +
         geom_bar(position = "dodge") +
-        scale_fill_manual(values = c(Feminino = "#9942D4", Masculino = "#F77333")) +
+        scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
         labs(title = "Total de Registrados por Distrito/Comunidade e Sexo",
              x = ifelse(input$comunidadeInputGeral != "Todos", "Comunidade", "Distrito"),
              y = "Total de Registrados") +
@@ -114,7 +114,7 @@ server <- function(input, output, session) {
       }
       ggplot(dados, eixo_x) +
         geom_bar(position = "dodge") +
-        scale_fill_manual(values = c(Feminino = "#9942D4", Masculino = "#F77333")) +
+        scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
         labs(title = "Número de Deslocados por Distrito/Comunidade e Sexo",
              x = ifelse(input$comunidadeInputGeral != "Todos", "Comunidade", "Distrito"),
              y = "Número de Deslocados") +
