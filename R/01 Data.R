@@ -111,7 +111,8 @@ presencas_PI <- presencas_PI %>%
   mutate(FormacaoPI = ifelse(FormacaoPI == "", "VAZIO", FormacaoPI))
 presencas_AG <- presencas_AG %>% 
   mutate(NomeSessao = ifelse(NomeSessao == "", "VAZIO", NomeSessao))
-
+presencas_PI<-filter(presencas_PI, FormacaoPI!="VAZIO")
+presencas_AG<-filter(presencas_AG, FormacaoPI!="VAZIO")
 indiv_PI<- presencas_PI %>% pivot_wider(names_from =FormacaoPI, values_from =presenca)
 
 indiv_PI <- indiv_PI %>%
@@ -171,7 +172,7 @@ Tabela_PI<- presencas_PI %>%
 write_xlsx(indiv_AG, "Data/indiv_AG.xlsx")
 write_xlsx(Tabela_PI, "Data/indiv_PI.xlsx")
 ############
-#
+#  
 # presencas_AG <- presencas_AG %>%
 #   mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
 #          `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))

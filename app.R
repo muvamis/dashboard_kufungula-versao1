@@ -1,10 +1,10 @@
 library(shiny)
 library(shinythemes)   
-
+  
 # Carregar UIs e Servers de abas individuais 
 source("R/01ui_aba1.R")
 # source("R/server_aba1.R") 
-source("R/02ui_aba2.R") 
+source("R/02ui_aba2.R")  
 # source("R/server_aba2.R") 
 # ... (outros sources conforme necessário)
 
@@ -84,7 +84,7 @@ server <- function(input, output, session) {
       }
       dados
     })
-    
+     
  
     # Gráfico de barras para 'registradosPorProvincia'
     output$registradosPorProvincia <- renderPlot({

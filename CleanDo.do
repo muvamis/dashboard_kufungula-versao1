@@ -31,7 +31,81 @@ clear all
 	replace Deslocado=Deslocados if Deslocado==""
 	drop Facilitadores Deslocados 
 	 drop _merge*/
-    save "$caminho\Lista_Nampula_Kufugula.dta", replace 
+	
+	* Parte 1
+replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1574", "KM1575", "KM1576", "KM1577", "KM1580", "KM1581")
+ replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1583", "KM1584", "KM1585", "KM1586", "KM1587", "KM1588")
+ replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1589", "KM1590", "KM1592", "KM1593", "KM1597", "KM1598")
+ replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1599", "KM1601", "KM1602", "KM1603", "KM1604", "KM1605")
+ replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1606", "KM1609", "KM1612", "KM1614", "KM1615", "KM1617")
+ replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1621", "KM1622", "KM1625", "KM1626", "KM1628", "KM1629")
+replace  Facilitador = "Domingas Abilio" if inlist(ID_Participante,"KM1630", "KM1631", "KM1632", "KM1633", "KM1636", "KM1637")
+replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1639", "KM1640", "KM1641", "KM1642", "KM1643", "KM1644", "KM1645")
+replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1646", "KM1647", "KM1648", "KM1649", "KM1650", "KM1651", "KM1652")
+replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1653", "KM1654", "KM1656", "KM1657", "KM1658", "KM1659")
+replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1660", "KM1661", "KM1664", "KM1665", "KM1666", "KM1667") 
+replace Facilitador = "Domingas Abilio" if inlist(ID_Participante,"KM1669", "KM1671", "KM1672", "KM2108", "KM2109", "KM2110")
+replace Facilitador = "Domingas Abilio" if inlist(ID_Participante,"KM2111", "KM2112", "KM2113", "KM2114", "KM2115", "KM2116")
+ replace Facilitador=upper(Facilitador)
+replace Facilitador="SERGIO SULULO" if Facilitador=="SéRGIO JOAQUIM SULULO"
+replace Facilitador="REMIGIO HORACIO" if Facilitador=="REMIGIO HORACIO "
+replace Facilitador="REMIGIO EUGENIO HORACIO" if Facilitador=="REMIGIO HORACIO"
+replace Facilitador="OMAR ALI" if Facilitador=="OMAR FRANCISCO ALI"
+replace Facilitador = trim(Facilitador)
+
+replace Facilitador="ALBERTINA CUALEIA" if Facilitador=="ALBERTINA LOURENçO JõAO CUALEIA"
+
+replace Facilitador="AGOSTINHO ADELINO" if Facilitador=="AGOSTINHO JúLIO ADELINO"
+
+replace Facilitador="CARLA ALBINO" if Facilitador=="CARLA ALFREDO ALBINO"
+
+replace Facilitador="DOMINGAS ABILIO" if Facilitador=="DOMINGAS ALBINO"
+
+replace Facilitador="ALBERTINA CUALEIA" if Facilitador=="ARGENTINA CUALEIA"
+
+replace Facilitador="JULECA FELISBERTO" if Facilitador=="JULECA JOAQUINA MARIA FELISBERTO"
+
+replace Facilitador="MAINOTE ABACAR" if Facilitador=="MAINOTE ABACAR CARLITOS" |  Facilitador=="MAINOTE ABUBACAR"
+
+replace Facilitador="MARLENE ALFREDO" if Facilitador=="MARLENE JOãO ALFREDO"
+replace Facilitador="CANDIDA FELISBERTO" if Facilitador=="CâNDIDA FELISBERTO CARLOS"
+
+
+//
+* Converter para maiúsculas
+replace Comunidade = upper(Comunidade)
+
+* Substituir acentos
+replace Comunidade = regexr(Comunidade, "á|Á", "A")
+replace Comunidade = regexr(Comunidade, "é|É", "E")
+replace Comunidade = regexr(Comunidade, "í|Í", "I")
+replace Comunidade = regexr(Comunidade, "ó|Ó", "O")
+replace Comunidade = regexr(Comunidade, "ú|Ú", "U")
+replace Comunidade = regexr(Comunidade, "à|À", "A")
+replace Comunidade = regexr(Comunidade, "è|È", "E")
+replace Comunidade = regexr(Comunidade, "ì|Ì", "I")
+replace Comunidade = regexr(Comunidade, "ò|Ò", "O")
+replace Comunidade = regexr(Comunidade, "ù|Ù", "U")
+replace Comunidade = regexr(Comunidade, "ã|Ã", "A")
+replace Comunidade = regexr(Comunidade, "õ|Õ", "O")
+replace Comunidade = regexr(Comunidade, "â|Â", "A")
+replace Comunidade = regexr(Comunidade, "ê|Ê", "E")
+replace Comunidade = regexr(Comunidade, "î|Î", "I")
+replace Comunidade = regexr(Comunidade, "ô|Ô", "O")
+replace Comunidade = regexr(Comunidade, "û|Û", "U")
+replace Comunidade = regexr(Comunidade, "ä|Ä", "A")
+replace Comunidade = regexr(Comunidade, "ë|Ë", "E")
+replace Comunidade = regexr(Comunidade, "ï|Ï", "I")
+replace Comunidade = regexr(Comunidade, "ö|Ö", "O")
+replace Comunidade = regexr(Comunidade, "ü|Ü", "U")
+replace Comunidade = regexr(Comunidade, "ç|Ç", "C")
+replace Comunidade = regexr(Comunidade, "ñ|Ñ", "N")
+replace Comunidade = trim(Comunidade)
+replace Comunidade ="MISEREPANE" if inlist(Comunidade, "MESEREPANE AND", "MESEREPANE", "MISEREPANE", "MISERIPANE")
+replace Comunidade ="MARROCANE" if inlist(Comunidade, "MAROCANE")
+
+    save "$caminho\Lista_Nampula_Kufugula.dta", replace  //gravar kufungula
+	 
     
  use "$caminho\Raw\Versao 3\Presencas.dta", clear 
  gen versao=3
@@ -174,29 +248,19 @@ replace Session = "Sessao 7" if Session == "Tecnicas de cuidados pre colheita, c
 replace Session = "Sessao 8" if Session == "Abordagem do Sistema de Desenvolvimento de Mercados (Ligação com o mercado)"
 // Substituir facilitadores para IDs correspondentes
  
-* Parte 1
-replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1574", "KM1575", "KM1576", "KM1577", "KM1580", "KM1581")
- replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1583", "KM1584", "KM1585", "KM1586", "KM1587", "KM1588")
- replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1589", "KM1590", "KM1592", "KM1593", "KM1597", "KM1598")
- replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1599", "KM1601", "KM1602", "KM1603", "KM1604", "KM1605")
- replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1606", "KM1609", "KM1612", "KM1614", "KM1615", "KM1617")
- replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1621", "KM1622", "KM1625", "KM1626", "KM1628", "KM1629")
-replace  Facilitador = "Domingas Abilio" if inlist(ID_Participante,"KM1630", "KM1631", "KM1632", "KM1633", "KM1636", "KM1637")
-replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1639", "KM1640", "KM1641", "KM1642", "KM1643", "KM1644", "KM1645")
-replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1646", "KM1647", "KM1648", "KM1649", "KM1650", "KM1651", "KM1652")
-replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1653", "KM1654", "KM1656", "KM1657", "KM1658", "KM1659")
-replace Facilitador = "Domingas Abilio" if inlist(ID_Participante, "KM1660", "KM1661", "KM1664", "KM1665", "KM1666", "KM1667") 
-replace Facilitador = "Domingas Abilio" if inlist(ID_Participante,"KM1669", "KM1671", "KM1672", "KM2108", "KM2109", "KM2110")
-replace Facilitador = "Domingas Abilio" if inlist(ID_Participante,"KM2111", "KM2112", "KM2113", "KM2114", "KM2115", "KM2116")
+
+//replace Comunidade = regexr(Comunidade, " ", "")
+* Verificar o resultado
+tab  Comunidade
  
 
-
-replace Facilitador=upper(Facilitador)
 replace Facilitator=Facilitador
-tab Facilitador, m 
+tab Facilitador Comunidade, m 
 replace Sexo=upper(Sexo)
  drop if ID_Participante==""
  drop if Nome_participante==""
+ 
+  
 save "$caminho\Presencas_clear.dta" , replace 
 
  ex
