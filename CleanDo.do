@@ -7,7 +7,7 @@ clear all
  save `desistente_monapo', replace 
    
   use "$caminho\Lista_Nampula_Kufugula.dta", clear 
-     
+      
   merge m:1 ID_Participante using `desistente_monapo'
  keep if _merge==1
  drop _merge 
@@ -103,10 +103,38 @@ replace Comunidade = regexr(Comunidade, "ñ|Ñ", "N")
 replace Comunidade = trim(Comunidade)
 replace Comunidade ="MISEREPANE" if inlist(Comunidade, "MESEREPANE AND", "MESEREPANE", "MISEREPANE", "MISERIPANE")
 replace Comunidade ="MARROCANE" if inlist(Comunidade, "MAROCANE")
+replace Facilitator= Facilitador if Facilitator==""
 
+  replace Deslocado="NAO" if ID_Participante=="KM0083"
+ save `geral', replace 
+  
+ //merge m:m ID_Participante using  "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\DEPARTAMENTO MIS\DEPARTAMENTO MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data\Raw\facilitador 12.dta"
+
+ tab  Comunidade
+ 
+
+replace Facilitador=Facilitator if Facilitador==""
+tab Facilitador Comunidade, m 
+replace Sexo=upper(Sexo)
+ drop if ID_Participante==""
+ drop if Nome_participante==""
+  replace Facilitador=Facilitadores if Facilitador==""
+  
+ 
+
+replace Comunidade = ustrregexra(Comunidade, "[éèêë]", "e") in 1
+replace Comunidade = ustrregexra(Comunidade, "[íìîï]", "i") in 1
+replace Comunidade = ustrregexra(Comunidade, "[óòõôö]", "o") in 1
+replace Comunidade = ustrregexra(Comunidade, "[úùûü]", "u") in 1
+replace Comunidade = ustrregexra(Comunidade, "[ç]", "c") in 1
+
+tab Comunidade
+
+ 
+ 
     save "$caminho\Lista_Nampula_Kufugula.dta", replace  //gravar kufungula
 	 
-    
+   
  use "$caminho\Raw\Versao 3\Presencas.dta", clear 
  gen versao=3
   append using "$caminho\Raw\Versao 5\Presencas.dta" 
@@ -117,7 +145,7 @@ replace Comunidade ="MARROCANE" if inlist(Comunidade, "MAROCANE")
   replace versao=8 if versao==.
   append using "$caminho\Raw\Versao 9\Presencas.dta" 
   replace versao=9 if versao==.
-  
+  //ren Facilitator Fa
  foreach i in Nome_Participante Provincia Nome_District Comunidade Facilitator Formation_PI Session_PI Formation_AG Session ID_Participante Turma Presenca Reposicao_sessao interview__status {
    decode `i' , generate(`i'_1) 
    drop `i'
@@ -125,8 +153,11 @@ replace Comunidade ="MARROCANE" if inlist(Comunidade, "MAROCANE")
 
 } 
  
- drop if Nome_District=="Ribaue" & versao!=9
   
+
+ drop if Nome_District=="Ribaue" & versao!=9 // Verificar 
+ 
+   
  keep if interview__status=="ApprovedByHeadquarters"
  merge m:1 ID_Participante using   `desistente_monapo'
  keep if _merge==1
@@ -251,14 +282,7 @@ replace Session = "Sessao 8" if Session == "Abordagem do Sistema de Desenvolvime
 
 //replace Comunidade = regexr(Comunidade, " ", "")
 * Verificar o resultado
-tab  Comunidade
- 
 
-replace Facilitator=Facilitador
-tab Facilitador Comunidade, m 
-replace Sexo=upper(Sexo)
- drop if ID_Participante==""
- drop if Nome_participante==""
  
   
 save "$caminho\Presencas_clear.dta" , replace 

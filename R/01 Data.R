@@ -116,7 +116,7 @@ presencas_AG<-filter(presencas_AG, FormacaoPI!="VAZIO")
 indiv_PI<- presencas_PI %>% pivot_wider(names_from =FormacaoPI, values_from =presenca)
 
 indiv_PI <- indiv_PI %>%
-  group_by(Nome_Participante, Distrito, Comunidade) %>%
+  group_by(ID_Participante,Nome_Participante, Distrito, Comunidade) %>%
   summarize(
     `Sessao 1` = ifelse(all(is.na(`Sessao 1`)), NA, max(`Sessao 1`, na.rm = TRUE)),
     `Sessao 2` = ifelse(all(is.na(`Sessao 2`)), NA, max(`Sessao 2`, na.rm = TRUE)),
@@ -134,7 +134,7 @@ indiv_PI <- indiv_PI %>%
 indiv_AG<- presencas_AG %>% pivot_wider(names_from =NomeSessao, values_from =presenca)
 
 indiv_AG <- indiv_AG %>%
-  group_by(Nome_Participante, Distrito, Comunidade) %>%
+  group_by(ID_Participante,Nome_Participante, Distrito, Comunidade) %>%
   summarize(
     `Sessao 1` = ifelse(all(is.na(`Sessao 1`)), NA, max(`Sessao 1`, na.rm = TRUE)),
     `Sessao 2` = ifelse(all(is.na(`Sessao 2`)), NA, max(`Sessao 2`, na.rm = TRUE)),

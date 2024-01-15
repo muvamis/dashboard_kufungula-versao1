@@ -249,6 +249,34 @@ server <- function(input, output, session) {
     selectInput("ind_input_com", "Escolha a Comunidade:", choices = c("TODOS",comunidades))
   })
   
+  #########
+  output$com_select_ui_ag <- renderUI({
+    distrito_escolhido <- input$ind_input_dist
+    comunidades <- unique(Presencas[Presencas$Distrito == distrito_escolhido, "Comunidade"])
+    selectInput("ind_input_com_ag", "Escolha a Comunidade:", choices = c("TODOS",comunidades))
+  })
+  
+  ########
+  # Renderizar a DataTable baseada na seleção do usuário
+  dados_filtrados_INDIV_AG <- reactive({
+    distrito_escolhido <- input$ind_input_dist_ag
+    comunidade_escolhida <- input$ind_input_com_ag
+
+    # Se 'TODOS' for selecionado no distrito, ignorar a filtragem por distrito
+    if (distrito_escolhido == "TODOS") {
+      dados <- indiv_AG
+    } else {
+      dados <- indiv_AG[indiv_AG$Distrito == distrito_escolhido, ]
+    }
+
+    # Aplicar filtragem adicional para a comunidade, se necessário
+    if (!is.null(comunidade_escolhida) && comunidade_escolhida != "TODOS") {
+      dados <- dados[dados$Comunidade == comunidade_escolhida, ]
+    }
+
+    dados
+  })
+  
   # Renderizar a DataTable baseada na seleção do usuário
   dados_filtrados_INDIV <- reactive({
     distrito_escolhido <- input$ind_input_dist
@@ -274,6 +302,11 @@ server <- function(input, output, session) {
     datatable(dados_filtrados_INDIV())
   })
   
+  # Usar dados_filtrados_INDIV no renderDataTable
+  output$Tabelaindividual_AG <- renderDataTable({
+    datatable(dados_filtrados_INDIV_AG())
+  })
+
   # Usar dados_filtrados_INDIV no downloadHandler
   output$downloadDataINDIVIDUL <- downloadHandler(
     filename = function() {
@@ -284,6 +317,17 @@ server <- function(input, output, session) {
       write.xlsx(dados_filtrados_INDIV(), file)
     }
   )
+  
+  # # Usar dados_filtrados_INDIV no downloadHandler
+  # output$downloadDataINDIVIDUL_AG <- downloadHandler(
+  #   filename = function() {
+  #     paste("Presencas_", input$ind_input_dist, "_", input$ind_input_com,"_",Sys.Date(), ".xlsx", sep = "")
+  #   },
+  #   content = function(file) {
+  #     require(openxlsx)
+  #     write.xlsx(dados_filtrados_INDIV_AG(), file)
+  #   }
+  # )
   # output$Tabelasessao <- renderDataTable({
   #   datatable(dadosFiltrados_TABELA())
   # })
