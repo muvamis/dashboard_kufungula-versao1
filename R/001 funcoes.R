@@ -1,12 +1,12 @@
 ####Funcoes 
-  
+   
 # Função para remover acentuação
 remove_accents <- function(text) {
   text <- tolower(text)
   text <- str_replace_all(text, "[^a-z0-9 ]", "")
   return(text)
 }
-
+ 
 calcular_frequencias <- function(data, ...) {
   # Agrupa por variáveis especificadas e calcula a contagem
   data_grouped <- data %>%
@@ -46,3 +46,4 @@ map_values <- function(value) {
     return(value)
   }
 }
+

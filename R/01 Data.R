@@ -1,4 +1,4 @@
- 
+  
  
 Kufungula <- read_dta("Data/Lista_Nampula_Kufugula.dta") 
  
@@ -32,7 +32,8 @@ Presencas <- Presencas %>%
     Formation_AG,
     Session,
     ID_Participante,
-    Presenca,
+    Presenca_AG,
+    Presenca_PI,
     Reposicao_sessao
   )
  Presencas$Distrito <- Presencas$Nome_District
@@ -75,7 +76,8 @@ Presencas$Distrito <- sub("Ribaué", "Ribaue", Presencas$Distrito)
 
 # Aplicar a função às colunas do DataFrame
 Presencas$Distrito <- remove_accents(Presencas$Distrito)
-Presencas$Presenca <- remove_accents(Presencas$Presenca)
+Presencas$Presenca_PI <- remove_accents(Presencas$Presenca_PI)
+Presencas$Presenca_AG <- remove_accents(Presencas$Presenca_AG)
 Presencas$Deslocado <- remove_accents(Presencas$Deslocado)
 Presencas$Facilitator <- remove_accents(Presencas$Facilitator)
 Presencas$Formation_AG <- remove_accents(Presencas$Formation_AG)
@@ -83,20 +85,19 @@ Presencas$Formation_PI <- remove_accents(Presencas$Formation_PI)
 
 # Transformar as colunas em maiúsculas
 Presencas$Distrito <- toupper(Presencas$Distrito)
-Presencas$Presenca <- toupper(Presencas$Presenca)
+Presencas$Presenca_AG <- toupper(Presencas$Presenca_AG)
 Presencas$Deslocado <- toupper(Presencas$Deslocado)
 Presencas$Facilitator <- toupper(Presencas$Facilitator)
 Presencas$Formation_AG <- toupper(Presencas$Formation_AG)
 Presencas$Formation_PI <- toupper(Presencas$Formation_PI)
- 
-
-
+Presencas$Presenca_PI <- toupper(Presencas$Presenca_PI) 
+Presencas$Comunidade <- toupper(Presencas$Comunidade) 
+Presencas$Distrito <- toupper(Presencas$Distrito)
 
 
 ###############################################################################
 Presencas <-  Presencas %>%
-  rename(presenca=Presenca,
-         FormacaoPI=Session_PI,
+  rename(FormacaoPI=Session_PI,
          NomeSessao=Session)
 
 Presencas<- Presencas  %>%
@@ -113,7 +114,7 @@ presencas_AG <- presencas_AG %>%
   mutate(NomeSessao = ifelse(NomeSessao == "", "VAZIO", NomeSessao))
 presencas_PI<-filter(presencas_PI, FormacaoPI!="VAZIO")
 presencas_AG<-filter(presencas_AG, FormacaoPI!="VAZIO")
-indiv_PI<- presencas_PI %>% pivot_wider(names_from =FormacaoPI, values_from =presenca)
+indiv_PI<- presencas_PI %>% pivot_wider(names_from =FormacaoPI, values_from =Presenca_PI)
 
 indiv_PI <- indiv_PI %>%
   group_by(ID_Participante,Nome_Participante, Distrito, Comunidade) %>%
@@ -131,7 +132,7 @@ indiv_PI <- indiv_PI %>%
  
  
  
-indiv_AG<- presencas_AG %>% pivot_wider(names_from =NomeSessao, values_from =presenca)
+indiv_AG<- presencas_AG %>% pivot_wider(names_from =NomeSessao, values_from =Presenca_AG)
 
 indiv_AG <- indiv_AG %>%
   group_by(ID_Participante,Nome_Participante, Distrito, Comunidade) %>%
@@ -160,7 +161,7 @@ presencas_AG <- presencas_AG %>%
  
 # Criação da tabela agregada
 Tabela_PI<- presencas_PI %>%
-  filter(presencas_PI$presenca == "SIM") %>%  # Filtrar apenas as presenças confirmadas
+  filter(presencas_PI$Presenca_PI == "SIM") %>%  # Filtrar apenas as presenças confirmadas
   group_by(Distrito,Comunidade, Sexo, NomeSessao) %>%
   summarise(
     totais = n(),  # Contagem total por grupo
@@ -179,7 +180,7 @@ write_xlsx(Tabela_PI, "Data/indiv_PI.xlsx")
 
 # # Criação da tabela agregada
 Tabela_AG <- presencas_AG %>%
-  filter(presencas_AG$presenca == "SIM") %>%  # Filtrar apenas as presenças confirmadas
+  filter(presencas_AG$Presenca_AG == "SIM") %>%  # Filtrar apenas as presenças confirmadas
   group_by(Distrito,Comunidade, Sexo, NomeSessao) %>%
   summarise(
     totais = n(),  # Contagem total por grupo

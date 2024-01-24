@@ -1,9 +1,9 @@
 library(shiny)
-library(shinythemes)   
+library(shinythemes)    
   
 # Carregar UIs e Servers de abas individuais 
 source("R/01ui_aba1.R")
-# source("R/server_aba1.R") 
+# source("R/server_aba1.R")  
 source("R/02ui_aba2.R")  
 # source("R/server_aba2.R") 
 # ... (outros sources conforme necessário)
@@ -73,6 +73,13 @@ server <- function(input, output, session) {
     # Função reativa para filtrar dados
     dadosFiltrados <- reactive({
       dados <- Kufungula
+      # Defina os intervalos de idade
+      dados$Etaria <- cut(
+        dados$Idade,
+        breaks = c(18, 24, 35),
+        labels = c("18-24", "25-35"),
+        include.lowest = TRUE
+      )
       if (input$ProvinciaInput != "Todos") {
         dados <- dados[dados$Provincia == input$ProvinciaInput,]
       }
@@ -89,7 +96,7 @@ server <- function(input, output, session) {
     # Gráfico de barras para 'registradosPorProvincia'
     output$registradosPorProvincia <- renderPlot({
       dados <- dadosFiltrados()
-      eixo_x <- if (input$comunidadeInputGeral != "Todos") {
+      eixo_x <- if (input$comunidadeInputGeral != "Todos") { 
         aes(x = Comunidade, fill = Sexo)
       } else {
         aes(x = Distrito, fill = Sexo)
@@ -106,21 +113,32 @@ server <- function(input, output, session) {
     
     # Gráfico de barras para 'deslocadosPorProvincia'
     output$deslocadosPorProvincia <- renderPlot({
-      dados <- subset(dadosFiltrados(), Deslocado == "Sim")
-      eixo_x <- if (input$comunidadeInputGeral != "Todos") {
-        aes(x = Comunidade, fill = Sexo)
-      } else {
-        aes(x = Distrito, fill = Sexo)
-      }
-      ggplot(dados, eixo_x) +
-        geom_bar(position = "dodge") +
+      
+      dados <- dadosFiltrados()
+      ggplot(dados, aes(x = Etaria, fill = Sexo)) +
+        geom_bar(position = "dodge", stat = "count") +
         scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
-        labs(title = "Número de Deslocados por Distrito/Comunidade e Sexo",
-             x = ifelse(input$comunidadeInputGeral != "Todos", "Comunidade", "Distrito"),
-             y = "Número de Deslocados") +
-        theme_stata() +
-        geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
-    })
+        labs(title = "Distribuição de Idades por Sexo",
+             x = "Faixa Etária",
+             y = "Contagem") +theme_stata() +
+        geom_text(stat = "count", aes(label = ..count..),
+          position = position_dodge(width = 0.9), vjust = -0.5, size = 3)  
+    }) 
+    #   dados <- subset(dadosFiltrados(), Deslocado == "Sim")
+    #   eixo_x <- if (input$comunidadeInputGeral != "Todos") {
+    #     aes(x = Comunidade, fill = Sexo)
+    #   } else {
+    #     aes(x = Distrito, fill = Sexo)
+    #   }
+    #   ggplot(dados, eixo_x) +
+    #     geom_bar(position = "dodge") +
+    #     scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
+    #     labs(title = "Número de Deslocados por Distrito/Comunidade e Sexo",
+    #          x = ifelse(input$comunidadeInputGeral != "Todos", "Comunidade", "Distrito"),
+    #          y = "Número de Deslocados") +
+    #     theme_stata() +
+    #     geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
+    # })
 ####################FIM DE GERAL ##########################################################
     
 ############## Nampula ########
@@ -152,7 +170,7 @@ server <- function(input, output, session) {
   }
 
   # Chamar a função calcular_frequencias com os dados filtrados
-  calcular_frequencias(dados_filtrados, FormacaoPI, Sexo, presenca)
+  calcular_frequencias(dados_filtrados, FormacaoPI, Sexo, Presenca_PI)
 })
 
   # RenderPlot para o gráfico ###formacao PI
@@ -161,9 +179,9 @@ server <- function(input, output, session) {
 
     dadosFiltrados_PI() %>%
       filter(!is.na(Sexo)) %>%
-      filter(presenca %in% "SIM") %>%
+      filter(Presenca_PI %in% "SIM") %>%
       ggplot() +
-      aes(x = FormacaoPI, y = Percentagem,  fill = as.factor(Sexo)) +
+      aes(x = FormacaoPI, y = n,  fill = as.factor(Sexo)) +
       geom_col(position = position_dodge()) +
       scale_color_manual(values = c("#9442D4", "#F77333"), name = "SEXO") +
       labs(y = "Produtores presentes nas sessões %", x = "Numero de Sessões") +
@@ -173,13 +191,14 @@ server <- function(input, output, session) {
         base_rect_size = 11 / 22
       ) +
       geom_text(
-        aes(label = sprintf("%d (%.0f%%)", n, Percentagem)),
+        #aes(label = sprintf("%d (%.0f%%)", n, Percentagem)),
+        aes(label = n),
         position = position_dodge(width = 0.9),
         vjust = 1.5,
         hjust = 0.5
       ) +
-      scale_y_continuous(limits = c(0, 100))+
-      expand_limits(y = 100)
+      scale_y_continuous(limits = c(0, 300))+
+      expand_limits(y = 300)
 
   })
   
@@ -211,17 +230,17 @@ server <- function(input, output, session) {
     }
     
     # Chamar a função calcular_frequencias com os dados filtrados
-    calcular_frequencias(dados_filtrados, NomeSessao, Sexo, presenca)
+    calcular_frequencias(dados_filtrados, NomeSessao, Sexo, Presenca_AG)
   })
   # RenderPlot para o gráfico ###formacao PI
   output$graficoParticipacaoGlobal_AG <- renderPlot({
     # Seu código para criar tab_freq_PI
     
-    dadosFiltrados_AG() %>%
+    dadosFiltrados_AG() %>% 
       filter(!is.na(Sexo)) %>%
-      filter(presenca %in% "SIM") %>%
+      filter(Presenca_AG %in% "SIM") %>%
       ggplot() +
-      aes(x = NomeSessao, y = Percentagem,  fill = as.factor(Sexo)) +
+      aes(x = NomeSessao, y = n,  fill = as.factor(Sexo)) +
       geom_col(position = position_dodge()) +
       scale_color_manual(values = c("#9442D4", "#F77333"), name = "SEXO") +
       labs(y = "Produtores presentes nas sessões %", x = "Numero de Sessões") +
@@ -231,13 +250,14 @@ server <- function(input, output, session) {
         base_rect_size = 11 / 22
       ) +
       geom_text(
-        aes(label = sprintf("%d (%.0f%%)", n, Percentagem)),
+        #aes(label = sprintf("%d (%.0f%%)", n, Percentagem)),
+        aes(label = n),
         position = position_dodge(width = 0.9),
         vjust = 1.5,
         hjust = 0.5
       ) +
-      scale_y_continuous(limits = c(0, 100))+
-      expand_limits(y = 100)
+      scale_y_continuous(limits = c(0, 300))+
+      expand_limits(y = 300)
     
   }) 
   
@@ -301,13 +321,13 @@ server <- function(input, output, session) {
   output$Tabelaindividual <- renderDataTable({
     datatable(dados_filtrados_INDIV())
   })
-  
+   
   # Usar dados_filtrados_INDIV no renderDataTable
   output$Tabelaindividual_AG <- renderDataTable({
     datatable(dados_filtrados_INDIV_AG())
   })
 
-  # Usar dados_filtrados_INDIV no downloadHandler
+  # Usar dados_filtrados_INDIV no downloadHandler 
   output$downloadDataINDIVIDUL <- downloadHandler(
     filename = function() {
       paste("Presencas_", input$ind_input_dist, "_", input$ind_input_com,"_",Sys.Date(), ".xlsx", sep = "")
@@ -316,7 +336,7 @@ server <- function(input, output, session) {
       require(openxlsx)
       write.xlsx(dados_filtrados_INDIV(), file)
     }
-  )
+  ) 
   
   # # Usar dados_filtrados_INDIV no downloadHandler
   # output$downloadDataINDIVIDUL_AG <- downloadHandler(
@@ -347,21 +367,21 @@ server <- function(input, output, session) {
      
     dados_selecionados
   })
-  
+   
   # Renderizar a DataTable baseada na seleção do usuário e filtragem
   output$downloadDatatABELA <- downloadHandler(
-    filename = function() {
+    filename = function() { 
       paste("tabela_", input$tabela_sessao, "_", Sys.Date(), ".xlsx", sep = "")
     },
     content = function(file) {
       require(openxlsx)
       write.xlsx(dadosFiltrados_TABELA(), file)
     }
-  )
+  ) 
   output$Tabelasessao <- renderDataTable({
     (datatable(dadosFiltrados_TABELA()))
   })
-   
+    
 } 
 # Executar o aplicativo
 shinyApp(ui, server)
