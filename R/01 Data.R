@@ -6,9 +6,9 @@ Kufungula <- read_dta("Data/Lista_Nampula_Kufugula.dta")
 Presencas <- read_dta("Data/Presencas_clear.dta")
 
 
-Nampula<- Kufungula %>% filter(Provincia=="NAMPULA") 
+  
 
-Cabo_Delgado<- Kufungula %>% filter(Provincia=="Cabo Delgado") 
+ 
  
   
 # Selecione apenas as colunas desejadas em Presencas_atualizado
@@ -22,21 +22,20 @@ Presencas <- Presencas %>%
     Nome_Participante,
     Provincia,
     Idade,
-    Nome_District,
+    Distrito,
     Deslocado,
     Comunidade,
     Sexo,
-    Facilitator,
     Formation_PI,
     Session_PI,
     Formation_AG,
     Session,
     ID_Participante,
     Presenca_AG,
-    Presenca_PI,
-    Reposicao_sessao
+    Presenca_PI
+   
   )
- Presencas$Distrito <- Presencas$Nome_District
+ #Presencas$Distrito <- Presencas$Nome_District
  
 Presencas$Distrito <- sub("Ribaué", "Ribaue", Presencas$Distrito)
  
@@ -79,7 +78,7 @@ Presencas$Distrito <- remove_accents(Presencas$Distrito)
 Presencas$Presenca_PI <- remove_accents(Presencas$Presenca_PI)
 Presencas$Presenca_AG <- remove_accents(Presencas$Presenca_AG)
 Presencas$Deslocado <- remove_accents(Presencas$Deslocado)
-Presencas$Facilitator <- remove_accents(Presencas$Facilitator)
+#Presencas$Facilitator <- remove_accents(Presencas$Facilitator)
 Presencas$Formation_AG <- remove_accents(Presencas$Formation_AG)
 Presencas$Formation_PI <- remove_accents(Presencas$Formation_PI)
 
@@ -87,7 +86,7 @@ Presencas$Formation_PI <- remove_accents(Presencas$Formation_PI)
 Presencas$Distrito <- toupper(Presencas$Distrito)
 Presencas$Presenca_AG <- toupper(Presencas$Presenca_AG)
 Presencas$Deslocado <- toupper(Presencas$Deslocado)
-Presencas$Facilitator <- toupper(Presencas$Facilitator)
+#Presencas$Facilitator <- toupper(Presencas$Facilitator)
 Presencas$Formation_AG <- toupper(Presencas$Formation_AG)
 Presencas$Formation_PI <- toupper(Presencas$Formation_PI)
 Presencas$Presenca_PI <- toupper(Presencas$Presenca_PI) 
@@ -108,15 +107,15 @@ presencas_PI<-filter(Presencas, Presencas$Formation_PI=="SIM")
 presencas_AG<-filter(Presencas, Presencas$Formation_AG=="SIM")
 
 # Substitua os valores vazios por "NOME_PADRAO" (ou qualquer outro valor não vazio desejado)
-presencas_PI <- presencas_PI %>% 
-  mutate(FormacaoPI = ifelse(FormacaoPI == "", "VAZIO", FormacaoPI))
-presencas_AG <- presencas_AG %>% 
-  mutate(NomeSessao = ifelse(NomeSessao == "", "VAZIO", NomeSessao))
-presencas_PI<-filter(presencas_PI, FormacaoPI!="VAZIO")
-presencas_AG<-filter(presencas_AG, FormacaoPI!="VAZIO")
+# presencas_PI <- presencas_PI %>% 
+#   mutate(FormacaoPI = ifelse(FormacaoPI == "", "VAZIO", FormacaoPI))
+# presencas_AG <- presencas_AG %>% 
+#   mutate(NomeSessao = ifelse(NomeSessao == "", "VAZIO", NomeSessao))
+# presencas_PI<-filter(presencas_PI, FormacaoPI!="VAZIO")
+# presencas_AG<-filter(presencas_AG, FormacaoPI!="VAZIO")
 indiv_PI<- presencas_PI %>% pivot_wider(names_from =FormacaoPI, values_from =Presenca_PI)
 
-indiv_PI <- indiv_PI %>%
+indiv_PI <- indiv_PI %>% 
   group_by(ID_Participante,Nome_Participante, Distrito, Comunidade) %>%
   summarize(
     `Sessao 1` = ifelse(all(is.na(`Sessao 1`)), NA, max(`Sessao 1`, na.rm = TRUE)),
@@ -129,9 +128,7 @@ indiv_PI <- indiv_PI %>%
     #`Sessao 8` = ifelse(all(is.na(`Sessao 8`)), NA, max(`Sessao 8`, na.rm = TRUE)),
     #`Sessao 9` = ifelse(all(is.na(`Sessao 9`)), NA, max(`Sessao 9`, na.rm = TRUE))
   )
- 
- 
- 
+  
 indiv_AG<- presencas_AG %>% pivot_wider(names_from =NomeSessao, values_from =Presenca_AG)
 
 indiv_AG <- indiv_AG %>%
@@ -147,10 +144,7 @@ indiv_AG <- indiv_AG %>%
     #`Sessao 8` = ifelse(all(is.na(`Sessao 8`)), NA, max(`Sessao 8`, na.rm = TRUE)),
    
   )
-
-
  
-###########
 presencas_PI <- presencas_PI %>%
   mutate(`Faixa Etária 18-24` = ifelse(Idade >= 18 & Idade <= 24, 1, 0),
          `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
@@ -169,7 +163,7 @@ Tabela_PI<- presencas_PI %>%
     `Faixa Etária 25-35` = sum(`Faixa Etária 25-35`, na.rm = TRUE)
   ) %>%
   ungroup()
-
+ 
 write_xlsx(indiv_AG, "Data/indiv_AG.xlsx")
 write_xlsx(Tabela_PI, "Data/indiv_PI.xlsx")
 ############

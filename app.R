@@ -197,8 +197,8 @@ server <- function(input, output, session) {
         vjust = 1.5,
         hjust = 0.5
       ) +
-      scale_y_continuous(limits = c(0, 300))+
-      expand_limits(y = 300)
+      scale_y_continuous(limits = c(0, 500))+
+      expand_limits(y = 500)
 
   })
   
@@ -256,8 +256,8 @@ server <- function(input, output, session) {
         vjust = 1.5,
         hjust = 0.5
       ) +
-      scale_y_continuous(limits = c(0, 300))+
-      expand_limits(y = 300)
+      scale_y_continuous(limits = c(0, 500))+
+      expand_limits(y = 500)
     
   }) 
   
@@ -357,15 +357,15 @@ server <- function(input, output, session) {
     dados_selecionados <- if (input$tabela_sessao == "AG") {
       Tabela_AG
     } else {
-      Tabela_PI
+      Tabela_PI  
     }
     
     # Aplicar filtro adicional com base na seleção da comunidade
     if (input$comunidadeInput_tabela != "TODAS") {
       dados_selecionados <- filter(dados_selecionados, Comunidade == input$comunidadeInput_tabela)
     }
-     
-    dados_selecionados
+      
+    dados_selecionados 
   })
    
   # Renderizar a DataTable baseada na seleção do usuário e filtragem
