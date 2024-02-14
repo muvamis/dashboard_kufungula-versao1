@@ -4,7 +4,7 @@
   global raw  "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\DEPARTAMENTO MIS\DEPARTAMENTO MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data\Raw"
 
  tempfile geral geral_PI geral_AG PI AG
-  
+   
  use "$caminho\Lista_Nampula_Kufugula.dta", clear
  drop if Nome_participante=="ALGlRA MACARlO"
 
@@ -46,7 +46,7 @@ replace ID_Participante="ΚΜ2052" if Nome_participante=="ACACIO ΑLΒΑΝΟ"
 
 
 
-
+ 
 
 	* Substituir acentos
 	replace Comunidade = regexr(Comunidade, "á|Á", "A")
