@@ -17,14 +17,6 @@ ui <- fluidPage(
               navbarMenu("Nampula",
                  tabPanel("Participação Global", ui_aba2),
                tabPanel("Participação Individual", ui_aba3)
-             #
-             #
-              ),
-             navbarMenu("Cabo Delgado",
-                        tabPanel("Participação Global", ui_aba5),
-                        tabPanel("Participação Individual", ui_aba4)
-
-
              )
               
              # ... (outras abas) 
