@@ -124,9 +124,9 @@ indiv_PI <- indiv_PI %>%
     `Sessao 4` = ifelse(all(is.na(`Sessao 4`)), NA, max(`Sessao 4`, na.rm = TRUE)),
     `Sessao 5` = ifelse(all(is.na(`Sessao 5`)), NA, max(`Sessao 5`, na.rm = TRUE)),
     `Sessao 6` = ifelse(all(is.na(`Sessao 6`)), NA, max(`Sessao 6`, na.rm = TRUE)),
-    #`Sessao 7` = ifelse(all(is.na(`Sessao 7`)), NA, max(`Sessao 7`, na.rm = TRUE)),
-    #`Sessao 8` = ifelse(all(is.na(`Sessao 8`)), NA, max(`Sessao 8`, na.rm = TRUE)),
-    #`Sessao 9` = ifelse(all(is.na(`Sessao 9`)), NA, max(`Sessao 9`, na.rm = TRUE))
+    `Sessao 7` = ifelse(all(is.na(`Sessao 7`)), NA, max(`Sessao 7`, na.rm = TRUE)),
+    `Sessao 8` = ifelse(all(is.na(`Sessao 8`)), NA, max(`Sessao 8`, na.rm = TRUE)),
+    `Sessao 9` = ifelse(all(is.na(`Sessao 9`)), NA, max(`Sessao 9`, na.rm = TRUE))
   )
   
 indiv_AG<- presencas_AG %>% pivot_wider(names_from =NomeSessao, values_from =Presenca_AG)
@@ -139,10 +139,10 @@ indiv_AG <- indiv_AG %>%
     `Sessao 3` = ifelse(all(is.na(`Sessao 3`)), NA, max(`Sessao 3`, na.rm = TRUE)),
     `Sessao 4` = ifelse(all(is.na(`Sessao 4`)), NA, max(`Sessao 4`, na.rm = TRUE)),
     `Sessao 5` = ifelse(all(is.na(`Sessao 5`)), NA, max(`Sessao 5`, na.rm = TRUE)),
-    #`Sessao 6` = ifelse(all(is.na(`Sessao 6`)), NA, max(`Sessao 6`, na.rm = TRUE)),
-    #`Sessao 7` = ifelse(all(is.na(`Sessao 7`)), NA, max(`Sessao 7`, na.rm = TRUE)),
-    #`Sessao 8` = ifelse(all(is.na(`Sessao 8`)), NA, max(`Sessao 8`, na.rm = TRUE)),
-   
+    `Sessao 6` = ifelse(all(is.na(`Sessao 6`)), NA, max(`Sessao 6`, na.rm = TRUE)),
+    `Sessao 7` = ifelse(all(is.na(`Sessao 7`)), NA, max(`Sessao 7`, na.rm = TRUE)),
+    `Sessao 8` = ifelse(all(is.na(`Sessao 8`)), NA, max(`Sessao 8`, na.rm = TRUE)),
+    `Sessao 9` = ifelse(all(is.na(`Sessao 9`)), NA, max(`Sessao 9`, na.rm = TRUE))
   )
  
 presencas_PI <- presencas_PI %>%
@@ -158,7 +158,7 @@ Tabela_PI<- presencas_PI %>%
   filter(presencas_PI$Presenca_PI == "SIM") %>%  # Filtrar apenas as presenças confirmadas
   group_by(Distrito,Comunidade, Sexo, NomeSessao) %>%
   summarise(
-    totais = n(),  # Contagem total por grupo
+    Totais = n(),  # Contagem total por grupo
     `Faixa Etária 18-24` = sum(`Faixa Etária 18-24`, na.rm = TRUE),
     `Faixa Etária 25-35` = sum(`Faixa Etária 25-35`, na.rm = TRUE)
   ) %>%
@@ -177,7 +177,7 @@ Tabela_AG <- presencas_AG %>%
   filter(presencas_AG$Presenca_AG == "SIM") %>%  # Filtrar apenas as presenças confirmadas
   group_by(Distrito,Comunidade, Sexo, NomeSessao) %>%
   summarise(
-    totais = n(),  # Contagem total por grupo
+    Totais = n(),  # Contagem total por grupo
     `Faixa Etária 18-24` = sum(`Faixa Etária 18-24`, na.rm = TRUE),
     `Faixa Etária 25-35` = sum(`Faixa Etária 25-35`, na.rm = TRUE)
   ) %>%

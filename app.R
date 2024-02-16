@@ -183,8 +183,7 @@ server <- function(input, output, session) {
         base_rect_size = 11 / 22
       ) +
       geom_text(
-        #aes(label = sprintf("%d (%.0f%%)", n, Percentagem)),
-        aes(label = n),
+        aes(label = sprintf("%d (%.0f%%)", n, (n/sum(n))*100)),
         position = position_dodge(width = 0.9),
         vjust = 1.5,
         hjust = 0.5
@@ -242,8 +241,7 @@ server <- function(input, output, session) {
         base_rect_size = 11 / 22
       ) +
       geom_text(
-        #aes(label = sprintf("%d (%.0f%%)", n, Percentagem)),
-        aes(label = n),
+        aes(label = sprintf("%d (%.0f%%)", n, (n/sum(n))*100)),
         position = position_dodge(width = 0.9),
         vjust = 1.5,
         hjust = 0.5
