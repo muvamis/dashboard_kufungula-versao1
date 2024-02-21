@@ -1,8 +1,25 @@
   clear all 
+ // more off
   
-  global caminho  "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\DEPARTAMENTO MIS\DEPARTAMENTO MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data"
-  global raw  "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\DEPARTAMENTO MIS\DEPARTAMENTO MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data\Raw"
+  
+ 
+  
+  // Definindo caminhos globais com base no usuário
+if "`c(username)'" == "MUVA" {
+    // Caminho global para o usuário maria
+    global caminho "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\DEPARTAMENTO MIS\DEPARTAMENTO MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data"
+    global raw  "C:\Users\MUVA\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\DEPARTAMENTO MIS\DEPARTAMENTO MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data\Raw"
 
+	}
+else if "`c(username)'" == "Dionisio" {
+    // Caminho global para o usuário joao
+     global caminho "C:\Users\Dionisio\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Janio Muianga\Departamento MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data"
+     global raw "C:\Users\Dionisio\OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA\Janio Muianga\Departamento MIS\PROJECTOS\SISTEMA DE MONITORIA\Kufungula\dashboard_kufungula-versao1\Data\Raw"
+
+}
+
+  
+  
  tempfile geral geral_PI geral_AG PI AG
    
  use "$caminho\Lista_Nampula_Kufugula.dta", clear
@@ -88,7 +105,7 @@ replace ID_Participante="ΚΜ2052" if Nome_participante=="ACACIO ΑLΒΑΝΟ"
   import excel "$raw\Lista de Presenças Kufungula actual.xlsx", sheet("Sheet1") firstrow clear 
   sort Nome
  
- replace ID = subinstr(ID, "O", "0", .)
+  replace ID = subinstr(ID, "O", "0", .)
   replace ID = subinstr(ID, " ", "", .)
   replace ID = subinstr(ID, "o", "0", .)
   replace Nome=trim(Nome)
@@ -200,7 +217,7 @@ tostring `i', replace
  foreach i in 1 2 3 4 5 6 7 8 9 {
  use `geral_PI', clear 
  
-  keep Nome_participante ID_Participante Distrito Comunidade ///
+  keep Nome_participante ID_Participante Distrito Comunidade Desistente DESISTENTE_AG nr_falta_AG Nr_sessoes_AG DESISTENTE_PI nr_falta_PI Nr_sessoes_PI ///
   SessaoPI_`i' Sexo Provincia Idade Posto_Administrativo Facilitador Deslocado Estado_saúde Actividade Faz_venda Culturas_praticadas_técnica Culturas_técnica_Milho Culturas_técnica_Gergelim Culturas_técnica_Mandioca Mercado_frequentado Mercado_Insumos Mercado_Produtos Mercado_Ambos Nomeecontactodoanimador Contacto Associação ContactoAnimador Província Nome_District Desistencia Data_nascimento Nome_Participante Facilitadores
   //gen Tipo_sessao="PI"
   //gen Nome_sessao="Sessao `i'"
@@ -247,7 +264,7 @@ erase "tempfile9.dta"
 foreach i in 1 2 3 4 5 6 7 8 9 {
  use `geral_PI', clear 
  
-  keep Nome_participante ID_Participante Distrito Comunidade ///
+  keep Nome_participante ID_Participante Distrito Comunidade Desistente DESISTENTE_AG nr_falta_AG Nr_sessoes_AG DESISTENTE_PI nr_falta_PI Nr_sessoes_PI ///
   SessaoAG_`i' Sexo Provincia Idade Posto_Administrativo Facilitador Deslocado Estado_saúde Actividade Faz_venda Culturas_praticadas_técnica Culturas_técnica_Milho Culturas_técnica_Gergelim Culturas_técnica_Mandioca Mercado_frequentado Mercado_Insumos Mercado_Produtos Mercado_Ambos Nomeecontactodoanimador Contacto Associação ContactoAnimador Província Nome_District Desistencia Data_nascimento Nome_Participante Facilitadores
   //gen Tipo_sessao="PI"
   //gen Nome_sessao="Sessao `i'"
@@ -338,11 +355,6 @@ merge m:m ID_Participante using `PI'
 	replace Sexo="FEMININO" if inlist(Nome_participante, "MARINA DOMINGOS", "SOFIA VALENTIM","TONIHA ALVARO", "GENITA DANIEL")
 	replace Sexo="MASCULINO" if Nome_participante=="RAIMUNDO J SARAIVA"
 
- 
-
-
-
-
 
 
      duplicates tag  ID_Participante, gen(dup)
@@ -351,9 +363,12 @@ merge m:m ID_Participante using `PI'
   br if dup==1
   drop dup
   br if Sexo==""
-	save "$caminho\Presencas_clear.dta", replace 
-   
 
+  replace Nome_Participante=Nome_participante if Nome_Participante==""
+  drop Nome_participante
+  save "$caminho\Presencas_clear.dta", replace 
+   
+br
  
 ex 
 

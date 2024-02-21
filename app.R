@@ -6,7 +6,7 @@ source("R/01ui_aba1.R")
 # source("R/server_aba1.R")  
 source("R/02ui_aba2.R")  
 # source("R/server_aba2.R") 
-# ... (outros sources conforme necessário)
+# ... (outros sources conforme necessário) 
 
 # Interface do usuário principal
 ui <- fluidPage(
@@ -116,6 +116,37 @@ server <- function(input, output, session) {
         geom_text(stat = "count", aes(label = ..count..),
           position = position_dodge(width = 0.9), vjust = -0.5, size = 3)  
     }) 
+    #desistentes
+    # Gráfico desiatentes'
+    dadosdesistentes <- reactive({
+      dados <- desistente %>%
+        filter(desistente$Desistente %in% "Sim") 
+      
+      if (input$ProvinciaInput != "Todos") {
+        dados <- dados[dados$Provincia == input$ProvinciaInput,]
+      }
+      if (input$distritoInputGeral != "Todos") {
+        dados <- dados[dados$Distrito == input$distritoInputGeral,]
+      }
+      if (input$comunidadeInputGeral != "Todos") {
+        dados <- dados[dados$Comunidade == input$comunidadeInputGeral,]
+      }
+      dados
+    })
+    
+    output$desistentesInput <- renderPlot({
+      dadosdesistente<-dadosdesistentes()
+            ggplot( dadosdesistente, aes(x = faixa_etaria, fill = Sexo)) +
+        geom_bar(position = "dodge", stat = "count") +
+        scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
+        labs(title = "Desistentes",
+             x = "Faixa Etária",
+             y = "Contagem") +theme_stata() +
+        geom_text(stat = "count", aes(label = ..count..),
+                  position = position_dodge(width = 0.9), vjust = -0.5, size = 3)  
+    }) 
+    
+    
     #   dados <- subset(dadosFiltrados(), Deslocado == "Sim")
     #   eixo_x <- if (input$comunidadeInputGeral != "Todos") {
     #     aes(x = Comunidade, fill = Sexo)
@@ -166,32 +197,33 @@ server <- function(input, output, session) {
 })
 
   # RenderPlot para o gráfico ###formacao PI
-  output$graficoParticipacaoGlobal <- renderPlot({
-    # Seu código para criar tab_freq_PI
-
-    dadosFiltrados_PI() %>%
-      filter(!is.na(Sexo)) %>%
-      filter(Presenca_PI %in% "SIM") %>%
-      ggplot() +
-      aes(x = FormacaoPI, y = n,  fill = as.factor(Sexo)) +
-      geom_col(position = position_dodge()) +
-      scale_color_manual(values = c("#9442D4", "#F77333"), name = "SEXO") +
-      labs(y = "Produtores presentes nas sessões %", x = "Numero de Sessões") +
-      theme_bw(
-        base_size = 14,
-        base_line_size = 11 / 22,
-        base_rect_size = 11 / 22
-      ) +
-      geom_text(
-        aes(label = sprintf("%d (%.0f%%)", n, (n/sum(n))*100)),
-        position = position_dodge(width = 0.9),
-        vjust = 1.5,
-        hjust = 0.5
-      ) +
-      scale_y_continuous(limits = c(0, 500))+
-      expand_limits(y = 500)
-
-  })
+    output$graficoParticipacaoGlobal <- renderPlot({
+      # Seu código para criar tab_freq_PI
+      
+      dadosFiltrados_PI() %>%
+        filter(!is.na(Sexo)) %>%
+        filter(Presenca_PI %in% "SIM") %>%
+        group_by(FormacaoPI) %>%
+        mutate(Percentagem = n / sum(n) * 100) %>%
+        ggplot() +
+        aes(x = FormacaoPI, y = n, fill = as.factor(Sexo)) +
+        geom_col(position = position_dodge()) +
+        scale_color_manual(values = c("#9442D4", "#F77333"), name = "SEXO") +
+        labs(y = "Produtores presentes nas sessões %", x = "Número de Sessões") +
+        theme_bw(
+          base_size = 14,
+          base_line_size = 11 / 22,
+          base_rect_size = 11 / 22
+        ) +
+        geom_text(
+          aes(label = paste0(n, " (", round(Percentagem), "%)")),
+          position = position_dodge(width = 0.9),
+          vjust = 1.5,
+          hjust = 0.5
+        ) +
+        scale_y_continuous(limits = c(0, 500)) +
+        expand_limits(y = 500)
+    })
   
 
 ######################## input filtro#################################
@@ -227,11 +259,13 @@ server <- function(input, output, session) {
   output$graficoParticipacaoGlobal_AG <- renderPlot({
     # Seu código para criar tab_freq_PI
     
-    dadosFiltrados_AG() %>% 
+    dadosFiltrados_AG() %>%
       filter(!is.na(Sexo)) %>%
       filter(Presenca_AG %in% "SIM") %>%
+      group_by(NomeSessao) %>%
+      mutate(Percentagem = n / sum(n) * 100) %>%
       ggplot() +
-      aes(x = NomeSessao, y = n,  fill = as.factor(Sexo)) +
+      aes(x = NomeSessao, y = n, fill = as.factor(Sexo)) +
       geom_col(position = position_dodge()) +
       scale_color_manual(values = c("#9442D4", "#F77333"), name = "SEXO") +
       labs(y = "Produtores presentes nas sessões %", x = "Numero de Sessões") +
@@ -241,14 +275,13 @@ server <- function(input, output, session) {
         base_rect_size = 11 / 22
       ) +
       geom_text(
-        aes(label = sprintf("%d (%.0f%%)", n, (n/sum(n))*100)),
+        aes(label = paste0(n, " (", round(Percentagem), "%)")),
         position = position_dodge(width = 0.9),
         vjust = 1.5,
         hjust = 0.5
       ) +
-      scale_y_continuous(limits = c(0, 500))+
+      scale_y_continuous(limits = c(0, 500)) +
       expand_limits(y = 500)
-    
   }) 
   
 
@@ -359,7 +392,7 @@ server <- function(input, output, session) {
   })
    
   # Renderizar a DataTable baseada na seleção do usuário e filtragem
-  output$downloadDatatABELA <- downloadHandler(
+output$downloadDatatABELA <- downloadHandler(
     filename = function() { 
       paste("tabela_", input$tabela_sessao, "_", Sys.Date(), ".xlsx", sep = "")
     },
@@ -371,7 +404,7 @@ server <- function(input, output, session) {
   output$Tabelasessao <- renderDataTable({
     (datatable(dadosFiltrados_TABELA()))
   })
-    
 } 
+
 # Executar o aplicativo
 shinyApp(ui, server)

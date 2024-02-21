@@ -2,10 +2,29 @@
  
 Kufungula <- read_dta("Data/Lista_Nampula_Kufugula.dta") 
  
+Kufungula<- Kufungula %>% 
+  group_by(Sexo) %>% 
+  mutate(Idade =ifelse(is.na(Idade), round(mean(Idade, na.rm = T), digits = 0), Idade)) %>%
+  ungroup()
+
+Kufungula<- Kufungula %>% 
+  group_by(Sexo) %>% 
+  mutate(Idade =ifelse(Idade<18, round(mean(Idade, na.rm = T), digits = 0), Idade)) %>%
+  ungroup()
  
+ 
+
 Presencas <- read_dta("Data/Presencas_clear.dta")
 
+Presencas<- Presencas %>% 
+  group_by(Sexo) %>% 
+  mutate(Idade =ifelse(is.na(Idade), round(mean(Idade, na.rm = T), digits = 0), Idade)) %>%
+  ungroup()
 
+Presencas<- Presencas %>% 
+  group_by(Sexo) %>% 
+  mutate(Idade =ifelse(Idade<18, round(mean(Idade, na.rm = T), digits = 0), Idade)) %>%
+  ungroup()
   
 
  
@@ -19,6 +38,9 @@ Presencas <- read_dta("Data/Presencas_clear.dta")
 # Presencas$Facilitator <- ifelse(is.na(Presencas$Facilitator.y), Presencas$Facilitator.x, Presencas$Facilitator.y)
 Presencas <- Presencas %>%
   select(
+    DESISTENTE_AG,
+    Desistente,
+    DESISTENTE_PI,
     Nome_Participante,
     Provincia,
     Idade,
@@ -184,5 +206,7 @@ Tabela_AG <- presencas_AG %>%
   ungroup()
  
  ####################################### 
+desistente <- distinct(Presencas, ID_Participante, Provincia,Comunidade, Desistente, Sexo, Distrito,Idade) %>%
+  mutate(faixa_etaria=ifelse(Idade >= 18 & Idade <= 24,"18-24 anos","25-35 anos"))
 
  

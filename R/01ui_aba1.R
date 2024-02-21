@@ -13,7 +13,8 @@ ui_aba1 <- fluidPage(
                mainPanel(
                  downloadButton("download_inscritos", "Baixar Inscritos", icon = icon("download")),
                  plotOutput("registradosPorProvincia"),
-                 plotOutput("deslocadosPorProvincia")
+                 plotOutput("deslocadosPorProvincia"),
+                 plotOutput("desistentesInput")
                )
              )
   #  )
