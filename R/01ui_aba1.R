@@ -1,13 +1,13 @@
 ui_aba1 <- fluidPage(
     
-    # Aba 'Overview'
+    # Aba 'Overview' 
   #navbarPage(
     title = "Navegação", 
-    id = "main_tabs",   
+    id = "main_tabs",      
     tabPanel("Visão Geral", 
              sidebarLayout(
                sidebarPanel(
-                 selectInput("ProvinciaInput", "Escolha a Provincia:", choices = c("Todos",unique(Kufungula$Provincia)), selected = "Todos"),
+                 radioButtons("ProvinciaInput", "DADOS DA PROVINCIA DE:", choices = "NAMPULA"),
                  selectInput("distritoInputGeral", "Escolha o Distrito:", choices = c("Todos",unique(Kufungula$Distrito)), selected = "Todos"),
                  selectInput("comunidadeInputGeral", "Escolha a Comunidade:", choices = c("Todos",unique(Kufungula$Comunidade)), selected = "Todos")),
                mainPanel(

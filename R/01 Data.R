@@ -1,7 +1,7 @@
   
- 
+
 Kufungula <- read_dta("Data/Lista_Nampula_Kufugula.dta") 
- 
+
 Kufungula<- Kufungula %>% 
   group_by(Sexo) %>% 
   mutate(Idade =ifelse(is.na(Idade), round(mean(Idade, na.rm = T), digits = 0), Idade)) %>%
@@ -12,7 +12,8 @@ Kufungula<- Kufungula %>%
   mutate(Idade =ifelse(Idade<18, round(mean(Idade, na.rm = T), digits = 0), Idade)) %>%
   ungroup()
  
- 
+Kufungula<- Kufungula %>% 
+  mutate(Provincia =ifelse(is.na(Provincia), "NAMPULA", Provincia)) 
 
 Presencas <- read_dta("Data/Presencas_clear.dta")
 
@@ -195,7 +196,7 @@ write_xlsx(Tabela_PI, "Data/indiv_PI.xlsx")
 #          `Faixa Etária 25-35` = ifelse(Idade > 24 & Idade <= 35, 1, 0))
 
 # # Criação da tabela agregada
-Tabela_AG <- presencas_AG %>%
+Tabela_AG <- presencas_AG %>% 
   filter(presencas_AG$Presenca_AG == "SIM") %>%  # Filtrar apenas as presenças confirmadas
   group_by(Distrito,Comunidade, Sexo, NomeSessao) %>%
   summarise(
@@ -208,5 +209,9 @@ Tabela_AG <- presencas_AG %>%
  ####################################### 
 desistente <- distinct(Presencas, ID_Participante, Provincia,Comunidade, Desistente, Sexo, Distrito,Idade) %>%
   mutate(faixa_etaria=ifelse(Idade >= 18 & Idade <= 24,"18-24 anos","25-35 anos"))
+##################
+
+#setwd("C:/Users/Dionisio/OneDrive - ASSOCIAÇÃO PARA O EMPODERAMENTO DA RAPARIGA-MUVA/Janio Muianga/Departamento MIS/PROJECTOS/SISTEMA DE MONITORIA/Kufungula/dashboard_kufungula-versao1/Data")
+lista_cabodelgado <- read_excel("Data/lista_cabodelgado.xlsx")
 
  

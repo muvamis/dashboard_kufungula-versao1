@@ -1,6 +1,6 @@
 library(shiny)
 library(shinythemes)    
-  
+   
 # Carregar UIs e Servers de abas individuais 
 source("R/01ui_aba1.R")
 # source("R/server_aba1.R")  
@@ -13,15 +13,33 @@ ui <- fluidPage(
   theme = shinytheme("flatly"),
   titlePanel("Dashboard Kufungula - Abrindo Oportunidades"),
   navbarPage("Navegação",
-             tabPanel("Visão Geral", ui_aba1),
-              navbarMenu("Nampula",
-                 tabPanel("Participação Global", ui_aba2),
-               tabPanel("Participação Individual", ui_aba3)
+             navbarMenu("Nampula",
+                        tabPanel("Visão Geral", ui_aba1),
+                        tabPanel("Participação Global", ui_aba2),
+                        tabPanel("Participação Individual", ui_aba3)
+             ),
+             navbarMenu("CaboDelgado",
+                        tabPanel("Visão Geral", ui_aba5),
+                        tabPanel("Lista_Global",
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                     # Dropdown para selecionar distrito
+                                     selectInput("distrito", "Selecione o Distrito:",
+                                                 c("Todos", unique(lista_cabodelgado$DISTRITO))),
+                                     # Dropdown para selecionar comunidade
+                                     selectInput("comunidade", "Selecione a Comunidade:",
+                                                 c("TODAS", unique(lista_cabodelgado$COMUNIDADE))),
+                                   # Botão para download
+                                   downloadButton("downloadData", "Baixar Tabela")
+                                 ),
+                                   mainPanel(
+                                     dataTableOutput("lista_cabodelgado")
+                                   )
+                                 )
+                        )
              )
-              
-             # ... (outras abas) 
-  ) 
-) 
+  )
+)
 
 # Lógica do servidor principal
 server <- function(input, output, session) {
@@ -30,7 +48,29 @@ server <- function(input, output, session) {
     #######################APA GERAL ##########################################  
   #baixar dados 
  # https://dashboard.muvamoz.org/dashboard/2023/dashboard_kufungula-versao1
-   
+   ###CABODELGADO 
+  
+    #actialuzar input por distrito e comunidade
+  observeEvent(input$ProvinciaInputCD, { 
+    distritos <- if (input$ProvinciaInputCD == "Todos") {
+      unique(lista_cabodelgado$DISTRITO) 
+    } else {
+      unique(lista_cabodelgado$DISTRITO[lista_cabodelgado$PROVINCIA == input$ProvinciaInputCD])
+    }
+    updateSelectInput(session, "distritoInputGeralCD", choices = c("Todos",unique(lista_cabodelgado$DISTRITO)))
+  })
+   ##COMUNIDADE INPUT 
+  observeEvent(input$distritoInputGeralCD, {
+    comunidades <- if (input$distritoInputGeral == "Todos") {
+      unique(lista_cabodelgado$COMUNIDADE)
+    } else {
+      unique(lista_cabodelgado$COMUNIDADE[lista_cabodelgado$DISTRITO == input$distritoInputGeralCD])
+    }
+    updateSelectInput(session, "comunidadeInputGeralCD", choices =c("Todos",unique(lista_cabodelgado$COMUNIDADE)))
+  })
+  
+  
+  #####################
   ###########################baixar dados de inscritos####################################
   output$download_inscritos <- downloadHandler(
     filename = function() {
@@ -404,6 +444,33 @@ output$downloadDatatABELA <- downloadHandler(
   output$Tabelasessao <- renderDataTable({
     (datatable(dadosFiltrados_TABELA()))
   })
+  #######################CABODELGADO#######################################################
+ 
+   output$lista_cabodelgado <- renderDataTable({
+     lista_cabodelgado <- lista_cabodelgado[, c("ID_PARTICIPANTE", "NOME_PARTICIPANTE", "DISTRITO", "COMUNIDADE")]
+     
+     # Aplica os filtros de distrito e comunidade
+     if (input$distrito != "Todos") {
+       lista_cabodelgado <- lista_cabodelgado[lista_cabodelgado$DISTRITO == input$distrito, ]
+     }
+     if (input$comunidade != "TODAS") {
+       lista_cabodelgado <- lista_cabodelgado[lista_cabodelgado$COMUNIDADE == input$comunidade, ]
+     }
+    datatable(lista_cabodelgado)
+    
+    }   )
+  
+  # Define a ação do botão de download
+  
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste("lista_Participantes_", Sys.Date(), ".xlsx", sep = "")
+    },
+    content = function(file) {
+      require(openxlsx)
+      write.xlsx(lista_participantes(), file)
+    }
+  )
 } 
 
 # Executar o aplicativo

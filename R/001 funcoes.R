@@ -38,9 +38,9 @@ renderizar_tabela_interativa <- function(dataframe, ...) {
 map_values <- function(value) {
   if (is.na(value)) {
     return("X")
-  } else if (value == "sim") {
+  } else if (value == "Sim") {
     return('<span style="color:green;">•</span>') # Bolinha verde
-  } else if (value == "nao") {
+  } else if (value == "Nao") {
     return('<span style="color:red;">•</span>')   # Bolinha vermelha
   } else {
     return(value)
