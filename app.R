@@ -19,27 +19,11 @@ ui <- fluidPage(
                         tabPanel("Participação Individual", ui_aba3)
              ),
              navbarMenu("CaboDelgado",
-                        tabPanel("Visão Geral", ui_aba5),
-                        tabPanel("Lista_Global",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     # Dropdown para selecionar distrito
-                                     selectInput("distrito", "Selecione o Distrito:",
-                                                 c("Todos", unique(lista_cabodelgado$DISTRITO))),
-                                     # Dropdown para selecionar comunidade
-                                     selectInput("comunidade", "Selecione a Comunidade:",
-                                                 c("TODAS", unique(lista_cabodelgado$COMUNIDADE))),
-                                   # Botão para download
-                                   downloadButton("downloadData", "Baixar Tabela")
-                                 ),
-                                   mainPanel(
-                                     dataTableOutput("lista_cabodelgado")
-                                   )
-                                 )
-                        )
+                        tabPanel("Visão Geral", ui_aba5)
              )
   )
 )
+                       
 
 # Lógica do servidor principal
 server <- function(input, output, session) {
@@ -48,29 +32,57 @@ server <- function(input, output, session) {
     #######################APA GERAL ##########################################  
   #baixar dados 
  # https://dashboard.muvamoz.org/dashboard/2023/dashboard_kufungula-versao1
-   ###CABODELGADO 
+   
+  ###########################CABODELGADO 
   
-    #actialuzar input por distrito e comunidade
-  observeEvent(input$ProvinciaInputCD, { 
-    distritos <- if (input$ProvinciaInputCD == "Todos") {
-      unique(lista_cabodelgado$DISTRITO) 
-    } else {
-      unique(lista_cabodelgado$DISTRITO[lista_cabodelgado$PROVINCIA == input$ProvinciaInputCD])
-    }
-    updateSelectInput(session, "distritoInputGeralCD", choices = c("Todos",unique(lista_cabodelgado$DISTRITO)))
-  })
-   ##COMUNIDADE INPUT 
-  observeEvent(input$distritoInputGeralCD, {
-    comunidades <- if (input$distritoInputGeral == "Todos") {
-      unique(lista_cabodelgado$COMUNIDADE)
-    } else {
-      unique(lista_cabodelgado$COMUNIDADE[lista_cabodelgado$DISTRITO == input$distritoInputGeralCD])
-    }
-    updateSelectInput(session, "comunidadeInputGeralCD", choices =c("Todos",unique(lista_cabodelgado$COMUNIDADE)))
+######################################
+  ################Geral CABODELGADO#####################################
+  # Função para filtrar os dados com base nas seleções do usuário
+   
+  output$registradoscabodelgado <- renderPlot({
+  ggplot(lista_cabodelgado, aes(x=DISTRITO, fill=SEXO)) + 
+      geom_bar(position = "dodge") +
+      scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
+      labs(title = "Total de Registrados por Distrito/Comunidade e Sexo",
+           x =  "Distrito",
+           y = "Total de Registrados") +
+      theme_stata() +
+      geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
   })
   
+  #####################DESLOCADOS######################################################
   
-  #####################
+  output$deslocadosCabodelgado <- renderPlot({
+    # Filtrar os dados considerando "Sim" e valores em branco/ausentes
+    dados_filtrados <- subset(lista_cabodelgado, DESLOCADO == "SIM" | is.na(DESLOCADO) | DESLOCADO == "")
+    
+    # Criar o gráfico de deslocados por sexo
+    ggplot(dados_filtrados, aes(x = DESLOCADO, fill = SEXO)) +
+      geom_bar(position = "dodge") +
+      scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
+      labs(title = "Total de Deslocados por Sexo",
+           x = "Deslocado",
+           y = "Número de Deslocados") +
+      theme_stata() +
+      geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
+  })
+#####################################FAZ_VENDA####################################
+  output$vendaCabodelgado <- renderPlot({
+    # Filtrar os dados considerando "Sim" e valores em branco/ausentes
+    dados_filtrados <- subset(lista_cabodelgado, FAZ_VENDA == "SIM" | is.na(FAZ_VENDA) | FAZ_VENDA == "")
+    
+    # Criar o gráfico de deslocados por sexo
+    ggplot(dados_filtrados, aes(x = FAZ_VENDA, fill = SEXO)) +
+      geom_bar(position = "dodge") +
+      scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
+      labs(title = "Distribuição de Vendas por Sexo",
+           x = "Faz_Vendas",
+           y = "Número dos que vendem") +
+      theme_stata() +
+      geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
+  })
+  
+  
   ###########################baixar dados de inscritos####################################
   output$download_inscritos <- downloadHandler(
     filename = function() {
@@ -136,9 +148,9 @@ server <- function(input, output, session) {
       ggplot(dados, eixo_x) +
         geom_bar(position = "dodge") +
         scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
-        labs(title = "Total de Registrados por Distrito/Comunidade e Sexo",
+        labs(title = "Total de Selecionados por Distrito/Comunidade e Sexo",
              x = ifelse(input$comunidadeInputGeral != "Todos", "Comunidade", "Distrito"),
-             y = "Total de Registrados") +
+             y = "Total de Selecionados") +
         theme_stata() +
         geom_text(aes(label = ..count..), stat = "count", position = position_dodge(width = 0.9), vjust = -0.25)
     }) 
@@ -150,7 +162,7 @@ server <- function(input, output, session) {
       ggplot(dados, aes(x = Etaria, fill = Sexo)) +
         geom_bar(position = "dodge", stat = "count") +
         scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
-        labs(title = "Distribuição de Idades por Sexo",
+        labs(title = "Distribuição de Selecionados por Idade/Sexo",
              x = "Faixa Etária",
              y = "Contagem") +theme_stata() +
         geom_text(stat = "count", aes(label = ..count..),
@@ -179,7 +191,7 @@ server <- function(input, output, session) {
             ggplot( dadosdesistente, aes(x = faixa_etaria, fill = Sexo)) +
         geom_bar(position = "dodge", stat = "count") +
         scale_fill_manual(values = c(FEMININO = "#9942D4", MASCULINO = "#F77333")) +
-        labs(title = "Desistentes",
+        labs(title = "Distribuicao de Desistentes por Idade",
              x = "Faixa Etária",
              y = "Contagem") +theme_stata() +
         geom_text(stat = "count", aes(label = ..count..),
