@@ -12,7 +12,7 @@ ui_aba5 <- fluidPage(
              column(6,
                     wellPanel((" ")),
                     (withSpinner(plotOutput("vendaCabodelgado"), color = "black"))
-             )
+            )
     ),
     tabPanel("Lista Global",
              sidebarLayout(

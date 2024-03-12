@@ -269,7 +269,7 @@ server <- function(input, output, session) {
         ) +
         geom_text(
           aes(label = paste0(n, " (", round(Percentagem), "%)")),
-          position = position_dodge(width = 0.9),
+          position = position_dodge(width = 1.1),
           vjust = 1.5,
           hjust = 0.5
         ) +
