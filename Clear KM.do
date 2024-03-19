@@ -216,8 +216,9 @@ tostring `i', replace
  
  foreach i in 1 2 3 4 5 6 7 8 9 {
  use `geral_PI', clear 
- 
-  keep Nome_participante ID_Participante Distrito Comunidade Desistente DESISTENTE_AG nr_falta_AG Nr_sessoes_AG DESISTENTE_PI nr_falta_PI Nr_sessoes_PI ///
+ ren nr_Falta_PI nr_falta_PI
+ ren nr_Falta_AG nr_falta_AG
+  keep Nome_participante ID_Participante Distrito Comunidade Desistente DESISTENTE_AG  Nr_sessoes_AG DESISTENTE_PI nr_falta_PI Nr_sessoes_PI ///
   SessaoPI_`i' Sexo Provincia Idade Posto_Administrativo Facilitador Deslocado Estado_saúde Actividade Faz_venda Culturas_praticadas_técnica Culturas_técnica_Milho Culturas_técnica_Gergelim Culturas_técnica_Mandioca Mercado_frequentado Mercado_Insumos Mercado_Produtos Mercado_Ambos Nomeecontactodoanimador Contacto Associação ContactoAnimador Província Nome_District Desistencia Data_nascimento Nome_Participante Facilitadores
   //gen Tipo_sessao="PI"
   //gen Nome_sessao="Sessao `i'"
@@ -239,7 +240,7 @@ save "tempfile`i'", replace
 	append using "tempfile7.dta"
 	append using "tempfile8.dta"
 	
-	
+	 
 	
 	replace Presenca=upper(Presenca)
 	replace Presenca="Sim" if Presenca=="P " | Presenca=="P" | Presenca==" P"
@@ -251,19 +252,20 @@ save "tempfile`i'", replace
 save `PI', replace 
 
  
-erase "tempfile1.dta"
-erase "tempfile2.dta"
-erase "tempfile3.dta"
-erase "tempfile4.dta"
-erase "tempfile5.dta"
-erase "tempfile6.dta"
-erase "tempfile7.dta"
-erase "tempfile8.dta"
-erase "tempfile9.dta"
+*erase "tempfile1.dta"
+*erase "tempfile2.dta"
+*erase "tempfile3.dta"
+*erase "tempfile4.dta"
+*erase "tempfile5.dta"
+*erase "tempfile6.dta"
+*erase "tempfile7.dta"
+*erase "tempfile8.dta"
+*erase "tempfile9.dta"
 
 foreach i in 1 2 3 4 5 6 7 8 9 {
  use `geral_PI', clear 
- 
+  ren nr_Falta_PI nr_falta_PI
+ ren nr_Falta_AG nr_falta_AG
   keep Nome_participante ID_Participante Distrito Comunidade Desistente DESISTENTE_AG nr_falta_AG Nr_sessoes_AG DESISTENTE_PI nr_falta_PI Nr_sessoes_PI ///
   SessaoAG_`i' Sexo Provincia Idade Posto_Administrativo Facilitador Deslocado Estado_saúde Actividade Faz_venda Culturas_praticadas_técnica Culturas_técnica_Milho Culturas_técnica_Gergelim Culturas_técnica_Mandioca Mercado_frequentado Mercado_Insumos Mercado_Produtos Mercado_Ambos Nomeecontactodoanimador Contacto Associação ContactoAnimador Província Nome_District Desistencia Data_nascimento Nome_Participante Facilitadores
   //gen Tipo_sessao="PI"
@@ -273,18 +275,18 @@ foreach i in 1 2 3 4 5 6 7 8 9 {
 
   ren SessaoAG_`i' Presenca 
 /// save `i', replace
-save "tempfile`i'", replace
+save "tempfile1`i'", replace
   }
 
   * Juntar os arquivos temporários usando append
-	append using "tempfile1.dta"
-	append using "tempfile2.dta"
-	append using "tempfile3.dta"
-	append using "tempfile4.dta"
-	append using "tempfile5.dta"
-	append using "tempfile6.dta"
-	append using "tempfile7.dta"
-	append using "tempfile8.dta"
+	append using "tempfile11.dta"
+	append using "tempfile12.dta"
+	append using "tempfile13.dta"
+	append using "tempfile14.dta"
+	append using "tempfile15.dta"
+	append using "tempfile16.dta"
+	append using "tempfile17.dta"
+	append using "tempfile18.dta"
 	
 	
 	replace Presenca = trim(Presenca)
@@ -307,6 +309,16 @@ erase "tempfile6.dta"
 erase "tempfile7.dta"
 erase "tempfile8.dta"
 erase "tempfile9.dta"
+
+erase "tempfile11.dta"
+erase "tempfile12.dta"
+erase "tempfile13.dta"
+erase "tempfile14.dta"
+erase "tempfile15.dta"
+erase "tempfile16.dta"
+erase "tempfile17.dta"
+erase "tempfile18.dta"
+
  
 merge m:m ID_Participante using `PI' 
  tab Presenca_PI Presenca_AG
@@ -357,7 +369,7 @@ merge m:m ID_Participante using `PI'
 
 
 
-     duplicates tag  ID_Participante, gen(dup)
+  duplicates tag  ID_Participante, gen(dup)
   tab dup
   sort ID_Participante
   br if dup==1
@@ -368,7 +380,7 @@ merge m:m ID_Participante using `PI'
   drop Nome_participante
   save "$caminho\Presencas_clear.dta", replace 
    
-br
+br 
  
 ex 
 

@@ -215,3 +215,4 @@ desistente <- distinct(Presencas, ID_Participante, Provincia,Comunidade, Desiste
 lista_cabodelgado <- read_excel("Data/lista_cabodelgado.xlsx")
 
  
+
