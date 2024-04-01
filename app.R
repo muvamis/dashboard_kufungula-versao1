@@ -276,7 +276,6 @@ server <- function(input, output, session) {
         scale_y_continuous(limits = c(0, 500)) +
         expand_limits(y = 500)
     })
-  
 
 ######################## input filtro#################################
   observeEvent(input$distritoInput_namp_AG, {
@@ -307,10 +306,7 @@ server <- function(input, output, session) {
     # Chamar a função calcular_frequencias com os dados filtrados
     calcular_frequencias(dados_filtrados, NomeSessao, Sexo, Presenca_AG)
   })
-  # RenderPlot para o gráfico ###formacao PI
   output$graficoParticipacaoGlobal_AG <- renderPlot({
-    # Seu código para criar tab_freq_PI
-    
     dadosFiltrados_AG() %>%
       filter(!is.na(Sexo)) %>%
       filter(Presenca_AG %in% "SIM") %>%
@@ -335,8 +331,6 @@ server <- function(input, output, session) {
       scale_y_continuous(limits = c(0, 500)) +
       expand_limits(y = 500)
   }) 
-  
-
 #########tabela individual ################################ 
   output$com_select_ui <- renderUI({
     distrito_escolhido <- input$ind_input_dist
