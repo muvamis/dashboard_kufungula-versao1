@@ -407,19 +407,19 @@ server <- function(input, output, session) {
     }
   ) 
   
-  # # Usar dados_filtrados_INDIV no downloadHandler
-  # output$downloadDataINDIVIDUL_AG <- downloadHandler(
-  #   filename = function() {
-  #     paste("Presencas_", input$ind_input_dist, "_", input$ind_input_com,"_",Sys.Date(), ".xlsx", sep = "")
-  #   },
-  #   content = function(file) {
-  #     require(openxlsx)
-  #     write.xlsx(dados_filtrados_INDIV_AG(), file)
-  #   }
-  # )
-  # output$Tabelasessao <- renderDataTable({
-  #   datatable(dadosFiltrados_TABELA())
-  # })
+  # Usar dados_filtrados_INDIV no downloadHandler
+  output$downloadDataINDIVIDUL_AG <- downloadHandler(
+    filename = function() {
+      paste("Presencas_", input$ind_input_dist, "_", input$ind_input_com,"_",Sys.Date(), ".xlsx", sep = "")
+    },
+    content = function(file) {
+      require(openxlsx)
+      write.xlsx(dados_filtrados_INDIV_AG(), file)
+    }
+  )
+  output$Tabelasessao <- renderDataTable({
+    datatable(dadosFiltrados_TABELA())
+  })
 ########################### TABELA PI ##########################################
   dadosFiltrados_TABELA <- reactive({
     # Escolher o dataframe com base na seleção do tipo de formação
